@@ -56,10 +56,11 @@ class _RoomsState extends State<Rooms> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
+          elevation: 0,
           automaticallyImplyLeading: false,
           title: const Text(
             'About rooms',
-            style: TextStyle(color: Colors.brown),
+            style: TextStyle(color: Colors.black),
           ),
         ),
         body: ListView(

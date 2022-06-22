@@ -11,18 +11,45 @@ class Home extends StatefulWidget {
   State<Home> createState() => _HomeState();
 }
 
-
 // ignore: deprecated_member_use
-String idFromRoomOwnerList='';
+String idFromRoomOwnerList = '';
 
 class _HomeState extends State<Home> {
   late Query _ref;
+  var url;
+
+
+   getProfileImage(String id)  {
+     var image;
+     FirebaseDatabase.instance
+        // ignore: deprecated_member_use
+        .reference()
+        .child(
+        'Users/room_owners/$id/profile_image')
+        .once()
+        .then((value) {
+      setState(() {
+        url = value.snapshot.value;
+         if(url==null)
+           {
+             image= AssetImage('assets/images/profile_png.jpg');
+           }
+         else
+           {
+             image= NetworkImage(url);
+           }
+      });
+    });
+
+     return image;
+  }
   @override
   void initState() {
     // TODO: implement initState
 
     super.initState();
     // ignore: deprecated_member_use
+    //getProfileImage();
     _ref = FirebaseDatabase.instance.reference().child('Users/room_owners');
   }
 
@@ -44,19 +71,23 @@ class _HomeState extends State<Home> {
                     child: ListTile(
                       title: Text(
                           '${owners['first_name']} ${owners['last_name']}'),
-                      leading: const CircleAvatar(
+                      leading: CircleAvatar(
                         radius: 30,
                         backgroundImage:
-                            AssetImage('assets/images/profile_png.jpg'),
+                            getProfileImage(owners['id'])
                       ),
                       trailing: Container(
                         margin: const EdgeInsets.only(right: 10, bottom: 2),
                         child: ElevatedButton(
                           onPressed: () {
                             print(owners.keys);
-                            setState((){
-                              idFromRoomOwnerList=owners['id'];
-                              Navigator.push(context, MaterialPageRoute(builder: (context)=>const OwnerProfileToVisit()));
+                            setState(() {
+                              idFromRoomOwnerList = owners['id'];
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) =>
+                                          const OwnerProfileToVisit()));
                             });
                           },
                           child: const Text('View this'),

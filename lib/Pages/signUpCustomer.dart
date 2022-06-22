@@ -156,6 +156,7 @@ class _SignUpCustomerState extends State<SignUpCustomer> {
                         dismissDirection: DismissDirection.up,
                       ));
                     } else {
+
                       registerUser(emailController.text.toString(),
                           passwordControll.text.toString());
                     }

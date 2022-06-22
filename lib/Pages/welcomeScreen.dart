@@ -11,10 +11,9 @@ class Welcome extends StatefulWidget {
 }
 
 class _WelcomeState extends State<Welcome> {
-
-  final contoller=PageController();
- bool isLastPage=false;
- String string='Next';
+  final contoller = PageController();
+  bool isLastPage = false;
+  String string = 'Next';
   @override
   void dispose() {
     contoller.dispose();
@@ -29,80 +28,95 @@ class _WelcomeState extends State<Welcome> {
         padding: const EdgeInsets.only(bottom: 80),
         child: PageView(
           controller: contoller,
-          onPageChanged: (index){
-            setState((){
-              if(index==2)
-                {
-                  isLastPage=true;
-                  string='Get Started';
-                }
-              else
-                {
-                  isLastPage=false;
-                  string='Next';
-                }
+          onPageChanged: (index) {
+            setState(() {
+              if (index == 2) {
+                isLastPage = true;
+                string = 'Get Started';
+              } else {
+                isLastPage = false;
+                string = 'Next';
+              }
             });
           },
           children: [
             Container(
               color: Colors.blueAccent.withOpacity(0.2),
-              child:  Column(
+              child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Center(
-                    child: Lottie.asset('assets/lottie/search.json')
-                  ),
+                  Center(child: Lottie.asset('assets/lottie/search.json')),
+
                 ],
               ),
             ),
             Container(
               color: Colors.blueAccent.withOpacity(0.2),
-              child:  Center(
-                  child: Lottie.asset('assets/lottie/find.json')
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Center(child: Lottie.asset('assets/lottie/find.json')),
+
+                ],
               ),
             ),
             Container(
               color: Colors.blueAccent.withOpacity(0.2),
-              child:  Center(
-                  child: Lottie.asset('assets/lottie/connect.json')
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Center(child: Lottie.asset('assets/lottie/connect.json')),
+                ],
               ),
             ),
-
           ],
         ),
       ),
-      bottomSheet:
-      Container(
+      bottomSheet: Container(
         height: 80,
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            TextButton(onPressed: (){
-                contoller.jumpToPage(2);
-            }, child: const Text('Skip',style: TextStyle(fontSize: 18),)),
+            TextButton(
+                onPressed: () {
+                  contoller.jumpToPage(2);
+                },
+                child: const Text(
+                  'Skip',
+                  style: TextStyle(fontSize: 18),
+                )),
             Center(
               child: SmoothPageIndicator(
                 onDotClicked: (index) {
-                  contoller.animateToPage(index, duration: const Duration(microseconds: 500), curve: Curves.easeIn);
+                  contoller.animateToPage(index,
+                      duration: const Duration(microseconds: 500),
+                      curve: Curves.easeIn);
                 },
                 controller: contoller,
                 count: 3,
                 effect: const WormEffect(
-                  spacing: 16,
-                  dotColor: Colors.black26,
-                  activeDotColor: Colors.orangeAccent
-                ),
+                    spacing: 16,
+                    dotColor: Colors.black26,
+                    activeDotColor: Colors.orangeAccent),
               ),
             ),
-            TextButton(onPressed: (){
-              if(string=='Get Started')
-                {
-                  Navigator.push(context,MaterialPageRoute(builder: (context)=>const StartingPage()));
-                }
-              else {
-                contoller.nextPage(duration: const Duration(microseconds: 500), curve: Curves.easeInOut);
-              }
-            }, child: Text(string,style: const TextStyle(fontSize: 18),))
+            TextButton(
+                onPressed: () {
+                  if (string == 'Get Started') {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const StartingPage()));
+                  } else {
+                    contoller.nextPage(
+                        duration: const Duration(microseconds: 500),
+                        curve: Curves.easeInOut);
+                  }
+                },
+                child: Text(
+                  string,
+                  style: const TextStyle(fontSize: 18),
+                ))
           ],
         ),
       ),

@@ -98,7 +98,6 @@ class _About_RulesState extends State<About_Rules> {
                     ));
                   } else {
 
-
                     var r=Random();
                     var n1=r.nextInt(16);
                     var n2=r.nextInt(15);

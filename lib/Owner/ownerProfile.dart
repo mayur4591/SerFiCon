@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:expandable/expandable.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:serficon/Owner/room_photos.dart';
@@ -29,35 +30,30 @@ class _OwnerProfileState extends State<OwnerProfile> {
   // ignore: deprecated_member_use
   final DatabaseReference databaseRef = FirebaseDatabase.instance.reference();
   // ignore: deprecated_member_use
-  Future<void> retriveData()  async {
+  Future<void> retriveData() async {
     print(uid);
     print("Hey your id is $uid");
     await databaseRef.child('Users/all_users/$uid').once().then((value) {
-      setState((){
-        if(value.snapshot!=null) {
+      setState(() {
+        if (value.snapshot != null) {
           Map<dynamic, dynamic>? map = value.snapshot.value as Map?;
           fname = map!['first_name'];
           lname = map['last_name'];
           email = map['email'];
           locaton = map['location'];
           phoneNumber = map['mobile_number'];
-          aboutOwner=map['about_owner']??'Add about your self.';
+          aboutOwner = map['about_owner'] ?? 'Add about your self.';
+          image = map['profile_image'];
           print(fname);
           print(lname);
           print(email);
           print(locaton);
           print(phoneNumber);
-        }
-        else{
+        } else {
           print(value.snapshot.value);
         }
       });
-
     });
-
-
-
-
   }
 
   var aboutOwner = 'Add about your self..';
@@ -70,18 +66,86 @@ class _OwnerProfileState extends State<OwnerProfile> {
 
   Future getOwnerImage(String name) async {
     if (name == 'Gallery') {
-      final PickedFile pickedFile = await ImagePicker()
+      String? url;
+
+      final profile =
+          await ImagePicker().pickImage(source: ImageSource.gallery);
+      // ignore: deprecated_member_use
+      Reference ref = FirebaseStorage.instance
+          .ref()
+          .child('room_owner')
+          .child(auth.currentUser!.uid)
+          .child('profile_image');
+      await ref.putFile(File(profile!.path));
+      ref.getDownloadURL().then((value) {
+        setState(() {
           // ignore: deprecated_member_use
-          .getImage(source: ImageSource.gallery) as PickedFile;
-      setState(() {
-        image = File(pickedFile.path);
+          Map<String, dynamic> map = {'profile_image': value};
+          FirebaseDatabase.instance
+              .reference()
+              .child(
+                  'Users/all_users/${FirebaseAuth.instance.currentUser!.uid}')
+              .update(map)
+              .then((value) {
+            FirebaseDatabase.instance
+                .reference()
+                .child(
+                    'Users/room_owners/${FirebaseAuth.instance.currentUser!.uid}')
+                .update(map);
+            FirebaseDatabase.instance
+                .reference()
+                .child(
+                    'Users/all_users/${FirebaseAuth.instance.currentUser!.uid}/profile_image')
+                .once()
+                .then((value) {
+              setState(() {
+                url = value.snapshot.value as String?;
+              });
+            });
+          });
+          print(value);
+          image = url;
+        });
       });
     } else if (name == 'Camera') {
-      final PickedFile pickedFile = await ImagePicker()
+      String? url;
+      final profile =
+          await ImagePicker().pickImage(source: ImageSource.gallery);
+      Reference ref = FirebaseStorage.instance
+          .ref()
+          .child('room_owner')
+          .child(auth.currentUser!.uid)
+          .child('profile_image');
+      await ref.putFile(File(profile!.path));
+      ref.getDownloadURL().then((value) {
+        setState(() {
           // ignore: deprecated_member_use
-          .getImage(source: ImageSource.camera) as PickedFile;
-      setState(() {
-        image = File(pickedFile.path);
+          Map<String, dynamic> map = {'profile_image': value};
+          FirebaseDatabase.instance
+              .reference()
+              .child(
+                  'Users/all_users/${FirebaseAuth.instance.currentUser!.uid}')
+              .update(map)
+              .then((value) {
+            FirebaseDatabase.instance
+                .reference()
+                .child(
+                    'Users/room_owners/${FirebaseAuth.instance.currentUser!.uid}')
+                .update(map);
+            FirebaseDatabase.instance
+                .reference()
+                .child(
+                    'Users/all_users/${FirebaseAuth.instance.currentUser!.uid}/profile_image')
+                .once()
+                .then((value) {
+              setState(() {
+                url = value.snapshot.value as String?;
+              });
+            });
+          });
+          print(value);
+          image = url;
+        });
       });
     }
   }
@@ -102,6 +166,7 @@ class _OwnerProfileState extends State<OwnerProfile> {
     // ignore: deprecated_member_use
     final User? user = auth.currentUser;
     uid = user!.uid;
+    getProfile();
     retriveData();
   }
 
@@ -111,22 +176,24 @@ class _OwnerProfileState extends State<OwnerProfile> {
         appBar: AppBar(
           elevation: 0,
           title: const Text(
-            'Mali Blocks',
+            'Profile',
           ),
           backgroundColor: Colors.blueAccent.withOpacity(0.5),
         ),
-        endDrawer: NavigationDrawer(),
+        endDrawer: const NavigationDrawer(),
         body: ListView(
           children: [
             buildTop(),
             buildInfo(),
             GestureDetector(
                 onTap: () {
-                  Navigator.push(context,
-                      MaterialPageRoute(builder: (context) => const About_Rooms()));
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const About_Rooms()));
                 },
                 child: const Card(
-                    elevation: 2,
+                    elevation: 1,
                     child: ListTile(
                       title: Text('About Rooms',
                           style: TextStyle(color: Colors.black, fontSize: 25)),
@@ -144,7 +211,7 @@ class _OwnerProfileState extends State<OwnerProfile> {
                         builder: (context) => const About_Facilities()));
               },
               child: const Card(
-                  elevation: 2,
+                  elevation: 1,
                   child: ListTile(
                     title: Text('Facilities',
                         style: TextStyle(color: Colors.black, fontSize: 25)),
@@ -157,11 +224,13 @@ class _OwnerProfileState extends State<OwnerProfile> {
             ),
             GestureDetector(
               onTap: () {
-                Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => const Room_Photos()));
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const Room_Photos()));
               },
               child: const Card(
-                  elevation: 2,
+                  elevation: 1,
                   child: ListTile(
                     title: Text('Photos',
                         style: TextStyle(color: Colors.black, fontSize: 25)),
@@ -174,11 +243,13 @@ class _OwnerProfileState extends State<OwnerProfile> {
             ),
             GestureDetector(
               onTap: () {
-                Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => const About_Rules()));
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const About_Rules()));
               },
               child: const Card(
-                  elevation: 2,
+                  elevation: 1,
                   child: ListTile(
                     title: Text('Rules & Ristrictions',
                         style: TextStyle(color: Colors.black, fontSize: 25)),
@@ -195,7 +266,7 @@ class _OwnerProfileState extends State<OwnerProfile> {
 
   Image getProfile() {
     return (image != null)
-        ? (Image.file(
+        ? (Image.network(
             image,
             height: 145,
             width: 145,
@@ -209,12 +280,11 @@ class _OwnerProfileState extends State<OwnerProfile> {
       );
 
   Widget buildTop() => Card(
-        elevation: 5,
+        elevation: 1,
         child: Center(
           child: Container(
             padding: const EdgeInsets.only(top: 10, left: 10, right: 10),
             color: Colors.white,
-            height: MediaQuery.of(context).size.height * 0.38,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
@@ -259,12 +329,10 @@ class _OwnerProfileState extends State<OwnerProfile> {
                   ),
                 ),
                 const SizedBox(
-                  height: 5,
+                  height: 15,
                 ),
-                const Text(
-                  'Mali blocks',
-                  style: TextStyle(color: Colors.grey, fontSize: 15),
-                )
+
+
               ],
             ),
           ),
@@ -273,12 +341,12 @@ class _OwnerProfileState extends State<OwnerProfile> {
 
   Widget buildInfo() => Card(
         shadowColor: Colors.grey,
-        elevation: 2,
+        elevation: 1,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Card(
-                elevation: 2,
+              elevation: 0,
                 child: Column(
                   children: [
                     ListTile(
@@ -296,8 +364,7 @@ class _OwnerProfileState extends State<OwnerProfile> {
                                     content: TextField(
                                       decoration: const InputDecoration(
                                           focusedBorder: OutlineInputBorder(),
-                                          enabledBorder:
-                                              OutlineInputBorder()),
+                                          enabledBorder: OutlineInputBorder()),
                                       keyboardType: TextInputType.multiline,
                                       maxLines: 4,
                                       controller: aboutOwnerController,
@@ -310,8 +377,7 @@ class _OwnerProfileState extends State<OwnerProfile> {
                                             if (aboutOwnerController
                                                 .text.isEmpty) {
                                               ScaffoldMessenger.of(context)
-                                                  .showSnackBar(
-                                                      const SnackBar(
+                                                  .showSnackBar(const SnackBar(
                                                 content: Text(
                                                     'Fill the above information.'),
                                                 backgroundColor: Colors.red,
@@ -320,26 +386,39 @@ class _OwnerProfileState extends State<OwnerProfile> {
                                               aboutOwner =
                                                   aboutOwnerController.text;
                                               aboutOwnerController.text = '';
-                                              Map<String,dynamic> map={'about_owner':aboutOwner.toString()};
-                                              databaseRef.child('Users/all_users/${auth.currentUser!.uid}').update(map).then((value) {
-                                                databaseRef.child('Users/room_owners/${auth.currentUser!.uid}').update(map);
+                                              Map<String, dynamic> map = {
+                                                'about_owner':
+                                                    aboutOwner.toString()
+                                              };
+                                              databaseRef
+                                                  .child(
+                                                      'Users/all_users/${auth.currentUser!.uid}')
+                                                  .update(map)
+                                                  .then((value) {
+                                                databaseRef
+                                                    .child(
+                                                        'Users/room_owners/${auth.currentUser!.uid}')
+                                                    .update(map);
                                               });
-                                              await databaseRef.child('Users/all_users/$uid').once().then((value) {
-                                                setState((){
-                                                  if(value.snapshot!=null) {
-                                                    Map<dynamic, dynamic>? map = value.snapshot.value as Map?;
-                                                     aboutOwner=map!['about_owner'];
-                                                  }
-                                                  else{
+                                              await databaseRef
+                                                  .child('Users/all_users/$uid')
+                                                  .once()
+                                                  .then((value) {
+                                                setState(() {
+                                                  if (value.snapshot != null) {
+                                                    Map<dynamic, dynamic>? map =
+                                                        value.snapshot.value
+                                                            as Map?;
+                                                    aboutOwner =
+                                                        map!['about_owner'];
+                                                  } else {
                                                     print(value.snapshot.value);
                                                   }
                                                 });
-
                                               });
                                               Navigator.pop(context, false);
                                               ScaffoldMessenger.of(context)
-                                                  .showSnackBar(
-                                                      const SnackBar(
+                                                  .showSnackBar(const SnackBar(
                                                 content: Text(
                                                     'Information updated...'),
                                                 backgroundColor: Colors.green,
@@ -365,17 +444,11 @@ class _OwnerProfileState extends State<OwnerProfile> {
                           color: Colors.grey,
                         ),
                       ),
-                      title: ExpandablePanel(
-                        header: const Text(
-                          "About",
-                          style: TextStyle(fontSize: 25),
-                        ),
-                        expanded: Text(
-                          aboutOwner,
-                          style: const TextStyle(fontSize: 15, color: Colors.grey),
-                        ),
-                        collapsed: const Text(''),
+                      title: const Text(
+                        "About",
+                        style: TextStyle(fontSize: 25),
                       ),
+                      subtitle: Text(aboutOwner),
                     ),
                   ],
                 )),
@@ -431,27 +504,6 @@ class _OwnerProfileState extends State<OwnerProfile> {
           ],
         ),
       );
-
-
 }
 
-// const Card(
-//   child: ListTile(
-//     tileColor: Colors.white,
-//     title: Text(
-//       'Mali blocks',
-//       style: TextStyle(
-//           color: Colors.black,
-//           fontWeight: FontWeight.bold,
-//           fontSize: 25),
-//     ),
-//     leading: Icon(
-//       Icons.edit,
-//       color: Colors.grey,
-//     ),
-//     trailing: Icon(
-//       Icons.menu,
-//       color: Colors.grey,
-//     ),
-//   ),
-// ),
+

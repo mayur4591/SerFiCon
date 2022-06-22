@@ -13,17 +13,38 @@ class RoomOwnerMenuPage extends StatefulWidget {
   const RoomOwnerMenuPage({Key? key}) : super(key: key);
   static String id = 'MenuPage';
   @override
-  State<RoomOwnerMenuPage> createState() =>_RoomOwnerMenuPage();
+  State<RoomOwnerMenuPage> createState() => _RoomOwnerMenuPage();
 }
 
 class _RoomOwnerMenuPage extends State<RoomOwnerMenuPage> {
   var role;
+  var url;
+  Future<void> getProfileImage() async {
+    await FirebaseDatabase.instance
+        .reference()
+        .child(
+            'Users/all_users/${FirebaseAuth.instance.currentUser!.uid}/profile_image')
+        .once()
+        .then((value) {
+      setState(() {
+        url = (value.snapshot.value as String?)!;
+      });
+    });
+  }
+
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
     // ignore: deprecated_member_use
+    getProfileImage();
     findRole();
+  }
+
+  get() {
+    return url == null
+        ? const AssetImage('assets/images/profile_png.jpg')
+        : NetworkImage(url);
   }
 
   @override
@@ -32,20 +53,19 @@ class _RoomOwnerMenuPage extends State<RoomOwnerMenuPage> {
       body: CustomScrollView(
         slivers: <Widget>[
           SliverAppBar(
-            title: Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                GestureDetector(
-                  onTap: () {
-                    goToProfile();
-                  },
-                  child: const CircleAvatar(
-                    radius: 30,
-                    backgroundImage:
-                    AssetImage('assets/images/profile_png.jpg'),
+            title: Container(
+              margin: const EdgeInsets.only(top: 7),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  GestureDetector(
+                    onTap: () {
+                      goToProfile();
+                    },
+                    child: CircleAvatar(radius: 25, backgroundImage: get()),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
             bottom: PreferredSize(
               preferredSize: const Size.fromHeight(20),
@@ -169,9 +189,8 @@ class _RoomOwnerMenuPage extends State<RoomOwnerMenuPage> {
   }
 
   void goToProfile() {
-      Navigator.push(context,
-          MaterialPageRoute(builder: (context) => const OwnerProfile()));
-
+    Navigator.push(
+        context, MaterialPageRoute(builder: (context) => const OwnerProfile()));
   }
 
   void findRole() {

@@ -11,7 +11,6 @@ import '../About/facilities.dart';
 import '../About/photos.dart';
 import '../About/ristrictions.dart';
 
-
 class OwnerProfileToVisit extends StatefulWidget {
   const OwnerProfileToVisit({Key? key}) : super(key: key);
   static String id = 'Profile';
@@ -25,17 +24,17 @@ class _OwnerProfileToVisitState extends State<OwnerProfileToVisit> {
   final double profileHeight = 144;
   final double bottom = 80;
   // ignore: deprecated_member_use
-  final DatabaseReference reference=FirebaseDatabase.instance.reference();
+  final DatabaseReference reference = FirebaseDatabase.instance.reference();
   late FirebaseAuth auth;
   var fname;
   var lname;
   var email;
   var phoneNumber;
   var location;
-  var aboutOwner='Not available yet..Wait until owner upload it.';
+  var aboutOwner = 'Not available yet..Wait until owner upload it.';
   // ignore: prefer_typing_uninitialized_variables
   var image;
-
+  late String url;
   // ignore: non_constant_identifier_names
   final Image profile_image = const Image(
       image: AssetImage("assets/images/profile_png.jpg"),
@@ -43,151 +42,146 @@ class _OwnerProfileToVisitState extends State<OwnerProfileToVisit> {
       height: 145,
       width: 145);
   Future getImage(String name) async {
-    if (name == 'Gallery') {
-      final PickedFile pickedFile = await ImagePicker()
-          // ignore: deprecated_member_use
-          .getImage(source: ImageSource.gallery) as PickedFile;
+    // ignore: deprecated_member_use
+    FirebaseDatabase.instance
+        .reference()
+        .child(
+            'Users/all_users/${FirebaseAuth.instance.currentUser!.uid}/profile_image')
+        .once()
+        .then((value) {
       setState(() {
-        image = File(pickedFile.path);
+        url = (value.snapshot.value as String?)!;
       });
-    } else if (name == 'Camera') {
-      final PickedFile pickedFile = await ImagePicker()
-          // ignore: deprecated_member_use
-          .getImage(source: ImageSource.camera) as PickedFile;
-      setState(() {
-        image = File(pickedFile.path);
-      });
-    }
+    });
   }
+
   Future<void> getData() async {
-    await reference.child('Users/room_owners/$idFromRoomOwnerList').once().then((value) {
-      setState((){
+    await reference
+        .child('Users/room_owners/$idFromRoomOwnerList')
+        .once()
+        .then((value) {
+      setState(() {
         print(idFromRoomOwnerList);
-        if(value.snapshot!=null) {
+        if (value.snapshot != null) {
           Map<dynamic, dynamic>? map = value.snapshot.value as Map?;
           fname = map!['first_name'];
           lname = map['last_name'];
           email = map['email'];
           location = map['location'];
           phoneNumber = map['mobile_number'];
-          aboutOwner=map['about_owner'] ?? 'Not available yet..Wait until owner upload it.';
+          aboutOwner = map['about_owner'] ??
+              'Not available yet..Wait until owner upload it.';
+          image = map['profile_image'];
           print(fname);
           print(lname);
           print(email);
           print(location);
           print(phoneNumber);
-        }
-        else{
+        } else {
           print(value.snapshot.value);
         }
       });
     });
-
   }
+
   var uid;
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    auth=FirebaseAuth.instance;
+    auth = FirebaseAuth.instance;
     final User? user = auth.currentUser;
     uid = user!.uid;
+    getProfile();
     getData();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Colors.blueAccent.withOpacity(0.3),
+        elevation: 0,
+        title: const Text('Profile',style: TextStyle(color: Colors.black),),
+      ),
         body: ListView(
-          children: [
-            const Card(
+      children: [
+        buildTop(),
+        buildInfo(),
+        GestureDetector(
+            onTap: () {
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => const Rooms()));
+            },
+            child: const Card(
+                elevation: 1,
+                child: ListTile(
+                  title: Text('About Rooms',
+                      style: TextStyle(color: Colors.black, fontSize: 25)),
+                  trailing: Icon(
+                    Icons.arrow_forward_ios_outlined,
+                    color: Colors.grey,
+                    size: 25,
+                  ),
+                ))),
+        GestureDetector(
+          onTap: () {
+            Navigator.push(context,
+                MaterialPageRoute(builder: (context) => const Facilities()));
+          },
+          child: const Card(
+              elevation: 1,
               child: ListTile(
-                tileColor: Colors.white,
-                title: Text(
-                  'Mali blocks',
-                  style: TextStyle(
-                      color: Colors.black,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 25),
+                title: Text('Facilities',
+                    style: TextStyle(color: Colors.black, fontSize: 25)),
+                trailing: Icon(
+                  Icons.arrow_forward_ios_outlined,
+                  color: Colors.grey,
+                  size: 25,
                 ),
-              ),
-            ),
-            buildTop(),
-            buildInfo(),
-            GestureDetector(
-                onTap: () {
-                  Navigator.push(context,
-                      MaterialPageRoute(builder: (context) => const Rooms()));
-                },
-                child: const Card(
-                    elevation: 2,
-                    child: ListTile(
-                      title: Text('About Rooms',
-                          style: TextStyle(color: Colors.black, fontSize: 25)),
-                      trailing: Icon(
-                        Icons.arrow_forward_ios_outlined,
-                        color: Colors.grey,
-                        size: 25,
-                      ),
-                    ))),
-            GestureDetector(
-              onTap: () {
-                Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => const Facilities()));
-              },
-              child: const Card(
-                  elevation: 2,
-                  child: ListTile(
-                    title: Text('Facilities',
-                        style: TextStyle(color: Colors.black, fontSize: 25)),
-                    trailing: Icon(
-                      Icons.arrow_forward_ios_outlined,
-                      color: Colors.grey,
-                      size: 25,
-                    ),
-                  )),
-            ),
-            GestureDetector(
-              onTap: () {
-                Navigator.push(
-                    context, MaterialPageRoute(builder: (context) => const Photos()));
-              },
-              child: const Card(
-                  elevation: 2,
-                  child: ListTile(
-                    title: Text('Photos',
-                        style: TextStyle(color: Colors.black, fontSize: 25)),
-                    trailing: Icon(
-                      Icons.arrow_forward_ios_outlined,
-                      color: Colors.grey,
-                      size: 25,
-                    ),
-                  )),
-            ),
-            GestureDetector(
-              onTap: () {
-                Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => const Ristrictions()));
-              },
-              child: const Card(
-                  elevation: 2,
-                  child: ListTile(
-                    title: Text('Rules & Ristrictions',
-                        style: TextStyle(color: Colors.black, fontSize: 25)),
-                    trailing: Icon(
-                      Icons.arrow_forward_ios_outlined,
-                      color: Colors.grey,
-                      size: 25,
-                    ),
-                  )),
-            )
-          ],
-        ));
+              )),
+        ),
+        GestureDetector(
+          onTap: () {
+            Navigator.push(context,
+                MaterialPageRoute(builder: (context) => const Photos()));
+          },
+          child: const Card(
+              elevation: 1,
+              child: ListTile(
+                title: Text('Photos',
+                    style: TextStyle(color: Colors.black, fontSize: 25)),
+                trailing: Icon(
+                  Icons.arrow_forward_ios_outlined,
+                  color: Colors.grey,
+                  size: 25,
+                ),
+              )),
+        ),
+        GestureDetector(
+          onTap: () {
+            Navigator.push(context,
+                MaterialPageRoute(builder: (context) => const Ristrictions()));
+          },
+          child: const Card(
+              elevation: 1,
+              child: ListTile(
+                title: Text('Rules & Ristrictions',
+                    style: TextStyle(color: Colors.black, fontSize: 25)),
+                trailing: Icon(
+                  Icons.arrow_forward_ios_outlined,
+                  color: Colors.grey,
+                  size: 25,
+                ),
+              )),
+        )
+      ],
+    ));
   }
 
   Image getProfile() {
     return (image != null)
-        ? (Image.file(
+        ? (Image.network(
             image,
             height: 145,
             width: 145,
@@ -201,11 +195,10 @@ class _OwnerProfileToVisitState extends State<OwnerProfileToVisit> {
       );
 
   Widget buildTop() => Card(
-        elevation: 5,
+        elevation: 1,
         child: Container(
           padding: const EdgeInsets.all(10),
           color: Colors.white,
-          height: MediaQuery.of(context).size.height * 0.29,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
@@ -213,38 +206,7 @@ class _OwnerProfileToVisitState extends State<OwnerProfileToVisit> {
               const SizedBox(
                 height: 10,
               ),
-              // Container(
-              //   child: Row(
-              //     mainAxisAlignment: MainAxisAlignment.center,
-              //     children: [
-              //       GestureDetector(
-              //           onTap: () {
-              //             getImage('Gallery');
-              //           },
-              //           child: const Icon(
-              //             Icons.image,
-              //             size: 30,
-              //             color: Colors.blue,
-              //           )),
-              //       const SizedBox(
-              //         width: 20,
-              //       ),
-              //       GestureDetector(
-              //           onTap: () {
-              //             getImage('Camera');
-              //           },
-              //           child: const Icon(
-              //             Icons.camera_alt_outlined,
-              //             size: 30,
-              //             color: Colors.green,
-              //           )),
-              //     ],
-              //   ),
-              // ),
-              // const SizedBox(
-              //   height: 10,
-              // ),
-               Text(
+              Text(
                 '$fname $lname',
                 style: const TextStyle(
                   color: Colors.black,
@@ -254,10 +216,8 @@ class _OwnerProfileToVisitState extends State<OwnerProfileToVisit> {
               const SizedBox(
                 height: 5,
               ),
-              const Text(
-                'Mali blocks',
-                style:  TextStyle(color: Colors.grey, fontSize: 15),
-              )
+
+
             ],
           ),
         ),
@@ -265,7 +225,7 @@ class _OwnerProfileToVisitState extends State<OwnerProfileToVisit> {
 
   Widget buildInfo() => Card(
         shadowColor: Colors.grey,
-        elevation: 2,
+        elevation: 1,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -274,24 +234,19 @@ class _OwnerProfileToVisitState extends State<OwnerProfileToVisit> {
                 child: Column(
                   children: [
                     ListTile(
-                        title: ExpandablePanel(
-                      header: const Text(
+                      title: const Text(
                         "About owner",
                         style: TextStyle(fontSize: 25),
                       ),
-                      expanded:  Text(
-                        '$aboutOwner',
-                        style: TextStyle(fontSize: 15, color: Colors.grey),
-                      ),
-                      collapsed: const Text(''),
-                    )),
+                      subtitle: Text(aboutOwner),
+                    ),
                   ],
                 )),
             const ListTile(
               title: Text('Contacts:',
                   style: TextStyle(color: Colors.black, fontSize: 25)),
             ),
-             ListTile(
+            ListTile(
               leading: const Icon(
                 Icons.location_on,
                 color: Colors.red,
@@ -306,7 +261,7 @@ class _OwnerProfileToVisitState extends State<OwnerProfileToVisit> {
                 style: const TextStyle(color: Colors.grey, fontSize: 15),
               ),
             ),
-             ListTile(
+            ListTile(
               leading: const Icon(
                 Icons.email_sharp,
                 color: Colors.redAccent,
@@ -321,7 +276,7 @@ class _OwnerProfileToVisitState extends State<OwnerProfileToVisit> {
                 style: const TextStyle(color: Colors.grey, fontSize: 15),
               ),
             ),
-             ListTile(
+            ListTile(
               leading: const Icon(
                 Icons.phone,
                 color: Colors.green,
@@ -342,7 +297,7 @@ class _OwnerProfileToVisitState extends State<OwnerProfileToVisit> {
 
   Widget buildContent() => Column(
         children: [
-           Text(
+          Text(
             '$fname $lname',
             style: const TextStyle(
                 fontWeight: FontWeight.bold, color: Colors.black, fontSize: 20),

@@ -17,24 +17,22 @@ class Ristrictions extends StatefulWidget {
 class _RistrictionsState extends State<Ristrictions> {
   late Query _ref;
 
-
-
   final DatabaseReference reference = FirebaseDatabase.instance.reference();
   late FirebaseAuth auth;
   final titlecontroller = TextEditingController();
   final ruleController = TextEditingController();
 
-  var title='Not given by owner yet';
-  var rule='Not given by owner yet';
-
+  var title = 'Not given by owner yet';
+  var rule = 'Not given by owner yet';
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
     // ignore: deprecated_member_use
-    _ref = FirebaseDatabase.instance.reference().child('Users/room_owners/$idFromRoomOwnerList/ristrictions');
-
+    _ref = FirebaseDatabase.instance
+        .reference()
+        .child('Users/room_owners/$idFromRoomOwnerList/ristrictions');
   }
 
   @override
@@ -52,28 +50,28 @@ class _RistrictionsState extends State<Ristrictions> {
             title: ExpandablePanel(
                 header: Text(
                   rule['ruletitle'],
-                  style: const TextStyle(
-                      fontSize: 25, color: Colors.black),
+                  style: const TextStyle(fontSize: 25, color: Colors.black),
                 ),
                 collapsed: const Text(''),
                 expanded: Text(
                   rule['ruledisc'],
-                  style: const TextStyle(
-                      fontSize: 20, color: Colors.grey),
+                  style: const TextStyle(fontSize: 20, color: Colors.grey),
                 ))));
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        automaticallyImplyLeading: false,
-        elevation: 0,
-        title: Text('Rules and ristrictions',style:TextStyle(color: Colors.black),),
-        backgroundColor: Colors.lightGreen.withOpacity(0.5),
-      ),
-        body:buildHome()
-    );
+        appBar: AppBar(
+          automaticallyImplyLeading: false,
+          elevation: 0,
+          title: Text(
+            'Rules and ristrictions',
+            style: TextStyle(color: Colors.black),
+          ),
+          backgroundColor: Colors.lightGreen.withOpacity(0.5),
+        ),
+        body: buildHome());
   }
 
   Widget buildHome() {
