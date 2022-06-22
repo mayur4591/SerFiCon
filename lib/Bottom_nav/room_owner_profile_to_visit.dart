@@ -1,7 +1,10 @@
 import 'dart:io';
 import 'package:expandable/expandable.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:serficon/Bottom_nav/roomOwnerList.dart';
 
 import '../About/about_rooms.dart';
 import '../About/facilities.dart';
@@ -9,18 +12,27 @@ import '../About/photos.dart';
 import '../About/ristrictions.dart';
 
 
-class Profile extends StatefulWidget {
-  const Profile({Key? key}) : super(key: key);
+class OwnerProfileToVisit extends StatefulWidget {
+  const OwnerProfileToVisit({Key? key}) : super(key: key);
   static String id = 'Profile';
 
   @override
-  State<Profile> createState() => _ProfileState();
+  State<OwnerProfileToVisit> createState() => _OwnerProfileToVisitState();
 }
 
-class _ProfileState extends State<Profile> {
+class _OwnerProfileToVisitState extends State<OwnerProfileToVisit> {
   final double coverHeight = 280;
   final double profileHeight = 144;
   final double bottom = 80;
+  // ignore: deprecated_member_use
+  final DatabaseReference reference=FirebaseDatabase.instance.reference();
+  late FirebaseAuth auth;
+  var fname;
+  var lname;
+  var email;
+  var phoneNumber;
+  var location;
+  var aboutOwner='Not available yet..Wait until owner upload it.';
   // ignore: prefer_typing_uninitialized_variables
   var image;
 
@@ -47,11 +59,45 @@ class _ProfileState extends State<Profile> {
       });
     }
   }
+  Future<void> getData() async {
+    await reference.child('Users/room_owners/$idFromRoomOwnerList').once().then((value) {
+      setState((){
+        print(idFromRoomOwnerList);
+        if(value.snapshot!=null) {
+          Map<dynamic, dynamic>? map = value.snapshot.value as Map?;
+          fname = map!['first_name'];
+          lname = map['last_name'];
+          email = map['email'];
+          location = map['location'];
+          phoneNumber = map['mobile_number'];
+          aboutOwner=map['about_owner'] ?? 'Not available yet..Wait until owner upload it.';
+          print(fname);
+          print(lname);
+          print(email);
+          print(location);
+          print(phoneNumber);
+        }
+        else{
+          print(value.snapshot.value);
+        }
+      });
+    });
+
+  }
+  var uid;
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    auth=FirebaseAuth.instance;
+    final User? user = auth.currentUser;
+    uid = user!.uid;
+    getData();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        backgroundColor: Colors.white30,
         body: ListView(
           children: [
             const Card(
@@ -198,9 +244,9 @@ class _ProfileState extends State<Profile> {
               // const SizedBox(
               //   height: 10,
               // ),
-              const Text(
-                'MAYUR KAMBLE',
-                style: TextStyle(
+               Text(
+                '$fname $lname',
+                style: const TextStyle(
                   color: Colors.black,
                   fontSize: 20,
                 ),
@@ -233,8 +279,8 @@ class _ProfileState extends State<Profile> {
                         "About owner",
                         style: TextStyle(fontSize: 25),
                       ),
-                      expanded: const Text(
-                        'Hello i am a student at walchand college of enginnering sangli am a second year student of computer science.',
+                      expanded:  Text(
+                        '$aboutOwner',
                         style: TextStyle(fontSize: 15, color: Colors.grey),
                       ),
                       collapsed: const Text(''),
@@ -245,49 +291,49 @@ class _ProfileState extends State<Profile> {
               title: Text('Contacts:',
                   style: TextStyle(color: Colors.black, fontSize: 25)),
             ),
-            const ListTile(
-              leading: Icon(
+             ListTile(
+              leading: const Icon(
                 Icons.location_on,
                 color: Colors.red,
                 size: 25,
               ),
-              title: Text(
+              title: const Text(
                 "Location",
                 style: TextStyle(color: Colors.black, fontSize: 20),
               ),
               subtitle: Text(
-                'Rui,Maharashtra',
-                style: TextStyle(color: Colors.grey, fontSize: 15),
+                '$location',
+                style: const TextStyle(color: Colors.grey, fontSize: 15),
               ),
             ),
-            const ListTile(
-              leading: Icon(
+             ListTile(
+              leading: const Icon(
                 Icons.email_sharp,
                 color: Colors.redAccent,
                 size: 25,
               ),
-              title: Text(
+              title: const Text(
                 "E-mail",
                 style: TextStyle(color: Colors.black, fontSize: 20),
               ),
               subtitle: Text(
-                'mayurkamble847@gmail.com',
-                style: TextStyle(color: Colors.grey, fontSize: 15),
+                '$email',
+                style: const TextStyle(color: Colors.grey, fontSize: 15),
               ),
             ),
-            const ListTile(
-              leading: Icon(
+             ListTile(
+              leading: const Icon(
                 Icons.phone,
                 color: Colors.green,
                 size: 25,
               ),
-              title: Text(
+              title: const Text(
                 "Phone",
                 style: TextStyle(color: Colors.black, fontSize: 20),
               ),
               subtitle: Text(
-                '+91 9604221742',
-                style: TextStyle(color: Colors.grey, fontSize: 15),
+                '+91 $phoneNumber',
+                style: const TextStyle(color: Colors.grey, fontSize: 15),
               ),
             ),
           ],
@@ -296,25 +342,25 @@ class _ProfileState extends State<Profile> {
 
   Widget buildContent() => Column(
         children: [
-          const Text(
-            'MAYUR KAMBLE',
-            style: TextStyle(
+           Text(
+            '$fname $lname',
+            style: const TextStyle(
                 fontWeight: FontWeight.bold, color: Colors.black, fontSize: 20),
           ),
           const SizedBox(
             height: 10,
           ),
           Row(
-            children: const [
-              Icon(
+            children: [
+              const Icon(
                 Icons.call,
                 color: Colors.grey,
               ),
-              SizedBox(
+              const SizedBox(
                 width: 10,
               ),
-              Text('9786950435',
-                  style: TextStyle(fontSize: 20, color: Colors.grey))
+              Text('+91 $phoneNumber',
+                  style: const TextStyle(fontSize: 20, color: Colors.grey))
             ],
           ),
         ],

@@ -2,9 +2,11 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:serficon/Pages/signInOwner.dart';
+import 'package:serficon/Pages/welcomeScreen.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'Settings.dart';
 
-class  NavigationDrawer extends StatefulWidget {
+class NavigationDrawer extends StatefulWidget {
   const NavigationDrawer({Key? key}) : super(key: key);
 
   @override
@@ -12,32 +14,37 @@ class  NavigationDrawer extends StatefulWidget {
 }
 
 class _State extends State<NavigationDrawer> {
-  String fname='loading';
-  String lname='';
-  String email='';
+  String fname = 'loading';
+  String lname = '';
+  String email = '';
   late FirebaseAuth _auth;
-  String id='';
-  getData()
-  {
+  String id = '';
+  getData() {
     // ignore: deprecated_member_use
-    FirebaseDatabase.instance.reference().child('Users/room_owners/$id').once().then((value) {
-      Map<dynamic,dynamic> map=value.snapshot.value as Map;
-      fname=map['first_name'];
-      lname=map['last_name'];
-      email=map['email'];
+    FirebaseDatabase.instance
+        .reference()
+        .child('Users/room_owners/$id')
+        .once()
+        .then((value) {
+      Map<dynamic, dynamic> map = value.snapshot.value as Map;
+      fname = map['first_name'];
+      lname = map['last_name'];
+      email = map['email'];
     });
   }
+
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    _auth=FirebaseAuth.instance;
-    id=_auth.currentUser!.uid;
+    _auth = FirebaseAuth.instance;
+    id = _auth.currentUser!.uid;
     getData();
   }
+
   @override
   Widget build(BuildContext context) {
-    return  Container(
+    return Container(
       margin: const EdgeInsets.only(top: 88),
       width: MediaQuery.of(context).size.width / 1.4,
       color: Colors.blueGrey,
@@ -51,22 +58,23 @@ class _State extends State<NavigationDrawer> {
               '$fname $lname',
               style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
-            subtitle:  Text(
+            subtitle: Text(
               '$email',
               style: TextStyle(color: Colors.grey, fontSize: 15),
             )),
         const Padding(
-          padding:  EdgeInsets.only(left: 15, right: 15),
-          child:  Divider(
+          padding: EdgeInsets.only(left: 15, right: 15),
+          child: Divider(
             thickness: 1,
             color: Colors.white,
           ),
         ),
         GestureDetector(
-            onTap: (){
-              Navigator.push(context, MaterialPageRoute(builder: (context) => Settings()));
+            onTap: () {
+              Navigator.push(
+                  context, MaterialPageRoute(builder: (context) => Settings()));
             },
-            child:const ListTile(
+            child: const ListTile(
               title: Text(
                 'Edit profile',
                 style: TextStyle(fontSize: 20),
@@ -81,25 +89,34 @@ class _State extends State<NavigationDrawer> {
               showDialog(
                   context: context,
                   builder: (context) => AlertDialog(
-                    title: const Text('Want to log out?'),
-                    actions: [
-                      GestureDetector(
-                          onTap: () {
-                            FirebaseAuth.instance.signOut();
-                            Navigator.pop(context);
-                            Navigator.push(context,MaterialPageRoute(builder: (context)=> SignInOwner()));
-                          },
-                          child: const Text('Yes')),
-                      GestureDetector(
-                          onTap: () {
-                            Navigator.pop(context, false);
-                          },
-                          child: const Text("No"))
-                    ],
-                  ));
+                        title: const Text('Want to log out?'),
+                        actions: [
+                          GestureDetector(
+                              onTap: () async {
+                                FirebaseAuth.instance.signOut();
+                                final SharedPreferences sharedPreferences =
+                                    await SharedPreferences.getInstance();
+                                print('Before removal:- ${sharedPreferences.getString('email')}');
+                                sharedPreferences.remove('email');
+                                print('After removal:- ${sharedPreferences.getString('email')}');
+                                // ignore: use_build_context_synchronously
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) =>
+                                            const Welcome()));
+                              },
+                              child: const Text('Yes')),
+                          GestureDetector(
+                              onTap: () {
+                                Navigator.pop(context, false);
+                              },
+                              child: const Text("No"))
+                        ],
+                      ));
             },
             child: const ListTile(
-              title:  Text(
+              title: Text(
                 'Log out',
                 style: TextStyle(fontSize: 20),
               ),
@@ -110,14 +127,5 @@ class _State extends State<NavigationDrawer> {
             )),
       ]),
     );
-
   }
 }
-
-
-
-
-
-
-
-

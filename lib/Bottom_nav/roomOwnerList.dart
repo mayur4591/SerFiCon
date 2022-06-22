@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_database/ui/firebase_animated_list.dart';
 import 'package:flutter/material.dart';
+import 'package:serficon/Bottom_nav/room_owner_profile_to_visit.dart';
 
 class Home extends StatefulWidget {
   const Home({Key? key}) : super(key: key);
@@ -12,8 +13,7 @@ class Home extends StatefulWidget {
 
 
 // ignore: deprecated_member_use
-
-final _auth = FirebaseAuth.instance;
+String idFromRoomOwnerList='';
 
 class _HomeState extends State<Home> {
   late Query _ref;
@@ -53,11 +53,11 @@ class _HomeState extends State<Home> {
                         margin: const EdgeInsets.only(right: 10, bottom: 2),
                         child: ElevatedButton(
                           onPressed: () {
-                            ScaffoldMessenger.of(context)
-                                .showSnackBar(const SnackBar(
-                              content: Text('Clicked..'),
-                              backgroundColor: Colors.blue,
-                            ));
+                            print(owners.keys);
+                            setState((){
+                              idFromRoomOwnerList=owners['id'];
+                              Navigator.push(context, MaterialPageRoute(builder: (context)=>const OwnerProfileToVisit()));
+                            });
                           },
                           child: const Text('View this'),
                         ),

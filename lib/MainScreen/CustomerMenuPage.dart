@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 
 import 'package:lottie/lottie.dart';
 
-import '../Bottom_nav/home.dart';
+import '../Bottom_nav/roomOwnerList.dart';
 import '../Bottom_nav/mess_owner_list.dart';
 import '../User/userprofile.dart';
 

@@ -2,6 +2,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:serficon/Pages/signInOwner.dart';
+import 'package:serficon/Pages/welcomeScreen.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'Edit_profile_user.dart';
 
@@ -79,12 +81,17 @@ class _UserDrawerState extends State<UserDrawer> {
                           title: const Text('Want to log out?'),
                           actions: [
                             GestureDetector(
-                                onTap: () {
-                                  Navigator.pop(context);
+                                onTap: () async {
+                                  FirebaseAuth.instance.signOut();
+                                  final SharedPreferences sharedPreferences=await SharedPreferences.getInstance();
+                                  print('Before removal:- ${sharedPreferences.getString('email')}');
+                                  sharedPreferences.remove('email');
+                                  print('After removal:- ${sharedPreferences.getString('email')}');
+                                  // ignore: use_build_context_synchronously
                                   Navigator.push(
                                       context,
                                       MaterialPageRoute(
-                                          builder: (context) => SignInOwner()));
+                                          builder: (context) => const Welcome()));
                                 },
                                 child: const Text('Yes')),
                             GestureDetector(

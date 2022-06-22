@@ -13,7 +13,6 @@ import 'about_rules.dart';
 class OwnerProfile extends StatefulWidget {
   const OwnerProfile({Key? key}) : super(key: key);
   static String id = "owner_profile";
-
   @override
   State<OwnerProfile> createState() => _OwnerProfileState();
 }
@@ -28,10 +27,40 @@ class _OwnerProfileState extends State<OwnerProfile> {
   String uid = '';
   late FirebaseAuth auth;
   // ignore: deprecated_member_use
-  DatabaseReference databaseRef = FirebaseDatabase.instance.reference();
+  final DatabaseReference databaseRef = FirebaseDatabase.instance.reference();
   // ignore: deprecated_member_use
+  Future<void> retriveData()  async {
+    print(uid);
+    print("Hey your id is $uid");
+    await databaseRef.child('Users/all_users/$uid').once().then((value) {
+      setState((){
+        if(value.snapshot!=null) {
+          Map<dynamic, dynamic>? map = value.snapshot.value as Map?;
+          fname = map!['first_name'];
+          lname = map['last_name'];
+          email = map['email'];
+          locaton = map['location'];
+          phoneNumber = map['mobile_number'];
+          aboutOwner=map['about_owner']??'Add about your self.';
+          print(fname);
+          print(lname);
+          print(email);
+          print(locaton);
+          print(phoneNumber);
+        }
+        else{
+          print(value.snapshot.value);
+        }
+      });
 
-  var aboutOwner = 'Add about your self';
+    });
+
+
+
+
+  }
+
+  var aboutOwner = 'Add about your self..';
   final aboutOwnerController = TextEditingController();
   final Image owner_profile_image = const Image(
       image: AssetImage("assets/images/profile_png.jpg"),
@@ -70,19 +99,14 @@ class _OwnerProfileState extends State<OwnerProfile> {
     super.initState();
     // ignore: deprecated_member_use
     auth = FirebaseAuth.instance;
-    try{
-      uid = auth.currentUser!.uid;
-    }catch(e)
-    {
-      print(e);
-    }
-    //retriveData();
+    // ignore: deprecated_member_use
+    final User? user = auth.currentUser;
+    uid = user!.uid;
+    retriveData();
   }
 
   @override
   Widget build(BuildContext context) {
-    retriveData();
-    print(uid);
     return Scaffold(
         appBar: AppBar(
           elevation: 0,
@@ -99,7 +123,7 @@ class _OwnerProfileState extends State<OwnerProfile> {
             GestureDetector(
                 onTap: () {
                   Navigator.push(context,
-                      MaterialPageRoute(builder: (context) => About_Rooms()));
+                      MaterialPageRoute(builder: (context) => const About_Rooms()));
                 },
                 child: const Card(
                     elevation: 2,
@@ -117,7 +141,7 @@ class _OwnerProfileState extends State<OwnerProfile> {
                 Navigator.push(
                     context,
                     MaterialPageRoute(
-                        builder: (context) => About_Facilities()));
+                        builder: (context) => const About_Facilities()));
               },
               child: const Card(
                   elevation: 2,
@@ -134,7 +158,7 @@ class _OwnerProfileState extends State<OwnerProfile> {
             GestureDetector(
               onTap: () {
                 Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => Room_Photos()));
+                    MaterialPageRoute(builder: (context) => const Room_Photos()));
               },
               child: const Card(
                   elevation: 2,
@@ -151,7 +175,7 @@ class _OwnerProfileState extends State<OwnerProfile> {
             GestureDetector(
               onTap: () {
                 Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => About_Rules()));
+                    MaterialPageRoute(builder: (context) => const About_Rules()));
               },
               child: const Card(
                   elevation: 2,
@@ -228,7 +252,7 @@ class _OwnerProfileState extends State<OwnerProfile> {
                   height: 10,
                 ),
                 Text(
-                  fname + " " + lname,
+                  "$fname $lname",
                   style: const TextStyle(
                     color: Colors.black,
                     fontSize: 20,
@@ -239,7 +263,7 @@ class _OwnerProfileState extends State<OwnerProfile> {
                 ),
                 const Text(
                   'Mali blocks',
-                  style: const TextStyle(color: Colors.grey, fontSize: 15),
+                  style: TextStyle(color: Colors.grey, fontSize: 15),
                 )
               ],
             ),
@@ -250,176 +274,165 @@ class _OwnerProfileState extends State<OwnerProfile> {
   Widget buildInfo() => Card(
         shadowColor: Colors.grey,
         elevation: 2,
-        child: Container(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Card(
-                  elevation: 2,
-                  child: Column(
-                    children: [
-                      ListTile(
-                        trailing: GestureDetector(
-                          onTap: () {
-                            showDialog(
-                                context: context,
-                                builder: (context) => AlertDialog(
-                                      title: const Text(
-                                        "Write about your self.",
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.bold,
-                                            fontSize: 20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Card(
+                elevation: 2,
+                child: Column(
+                  children: [
+                    ListTile(
+                      trailing: GestureDetector(
+                        onTap: () {
+                          showDialog(
+                              context: context,
+                              builder: (context) => AlertDialog(
+                                    title: const Text(
+                                      "Write about your self.",
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 20),
+                                    ),
+                                    content: TextField(
+                                      decoration: const InputDecoration(
+                                          focusedBorder: OutlineInputBorder(),
+                                          enabledBorder:
+                                              OutlineInputBorder()),
+                                      keyboardType: TextInputType.multiline,
+                                      maxLines: 4,
+                                      controller: aboutOwnerController,
+                                      maxLength: 500,
+                                    ),
+                                    actions: [
+                                      GestureDetector(
+                                        onTap: () {
+                                          setState(() async {
+                                            if (aboutOwnerController
+                                                .text.isEmpty) {
+                                              ScaffoldMessenger.of(context)
+                                                  .showSnackBar(
+                                                      const SnackBar(
+                                                content: Text(
+                                                    'Fill the above information.'),
+                                                backgroundColor: Colors.red,
+                                              ));
+                                            } else {
+                                              aboutOwner =
+                                                  aboutOwnerController.text;
+                                              aboutOwnerController.text = '';
+                                              Map<String,dynamic> map={'about_owner':aboutOwner.toString()};
+                                              databaseRef.child('Users/all_users/${auth.currentUser!.uid}').update(map).then((value) {
+                                                databaseRef.child('Users/room_owners/${auth.currentUser!.uid}').update(map);
+                                              });
+                                              await databaseRef.child('Users/all_users/$uid').once().then((value) {
+                                                setState((){
+                                                  if(value.snapshot!=null) {
+                                                    Map<dynamic, dynamic>? map = value.snapshot.value as Map?;
+                                                     aboutOwner=map!['about_owner'];
+                                                  }
+                                                  else{
+                                                    print(value.snapshot.value);
+                                                  }
+                                                });
+
+                                              });
+                                              Navigator.pop(context, false);
+                                              ScaffoldMessenger.of(context)
+                                                  .showSnackBar(
+                                                      const SnackBar(
+                                                content: Text(
+                                                    'Information updated...'),
+                                                backgroundColor: Colors.green,
+                                              ));
+                                            }
+                                          });
+                                        },
+                                        child: const Text('Save'),
                                       ),
-                                      content: TextField(
-                                        decoration: const InputDecoration(
-                                            focusedBorder: OutlineInputBorder(),
-                                            enabledBorder:
-                                                OutlineInputBorder()),
-                                        keyboardType: TextInputType.multiline,
-                                        maxLines: 4,
-                                        controller: aboutOwnerController,
-                                        maxLength: 500,
-                                      ),
-                                      actions: [
-                                        GestureDetector(
+                                      GestureDetector(
                                           onTap: () {
                                             setState(() {
-                                              if (aboutOwnerController
-                                                  .text.isEmpty) {
-                                                ScaffoldMessenger.of(context)
-                                                    .showSnackBar(
-                                                        const SnackBar(
-                                                  content: Text(
-                                                      'Fill the above information.'),
-                                                  backgroundColor: Colors.red,
-                                                ));
-                                              } else {
-                                                aboutOwner =
-                                                    aboutOwnerController.text;
-                                                aboutOwnerController.text = '';
-                                                Navigator.pop(context, false);
-                                                ScaffoldMessenger.of(context)
-                                                    .showSnackBar(
-                                                        const SnackBar(
-                                                  content: Text(
-                                                      'Information updated...'),
-                                                  backgroundColor: Colors.green,
-                                                ));
-                                              }
+                                              Navigator.pop(context, false);
                                             });
                                           },
-                                          child: const Text('Save'),
-                                        ),
-                                        GestureDetector(
-                                            onTap: () {
-                                              setState(() {
-                                                Navigator.pop(context, false);
-                                              });
-                                            },
-                                            child: const Text('Cancel'))
-                                      ],
-                                    ));
-                          },
-                          child: Icon(
-                            Icons.edit,
-                            size: 20,
-                            color: Colors.grey,
-                          ),
-                        ),
-                        title: ExpandablePanel(
-                          header: const Text(
-                            "About",
-                            style: TextStyle(fontSize: 25),
-                          ),
-                          expanded: Text(
-                            aboutOwner,
-                            style: TextStyle(fontSize: 15, color: Colors.grey),
-                          ),
-                          collapsed: const Text(''),
+                                          child: const Text('Cancel'))
+                                    ],
+                                  ));
+                        },
+                        child: const Icon(
+                          Icons.edit,
+                          size: 20,
+                          color: Colors.grey,
                         ),
                       ),
-                    ],
-                  )),
-              const ListTile(
-                title: Text('Contacts:',
-                    style: TextStyle(color: Colors.black, fontSize: 25)),
+                      title: ExpandablePanel(
+                        header: const Text(
+                          "About",
+                          style: TextStyle(fontSize: 25),
+                        ),
+                        expanded: Text(
+                          aboutOwner,
+                          style: const TextStyle(fontSize: 15, color: Colors.grey),
+                        ),
+                        collapsed: const Text(''),
+                      ),
+                    ),
+                  ],
+                )),
+            const ListTile(
+              title: Text('Contacts:',
+                  style: TextStyle(color: Colors.black, fontSize: 25)),
+            ),
+            ListTile(
+              leading: const Icon(
+                Icons.location_on,
+                color: Colors.red,
+                size: 25,
               ),
-              ListTile(
-                leading: const Icon(
-                  Icons.location_on,
-                  color: Colors.red,
-                  size: 25,
-                ),
-                title: const Text(
-                  "Location",
-                  style: TextStyle(color: Colors.black, fontSize: 20),
-                ),
-                subtitle: Text(
-                  locaton,
-                  style: TextStyle(color: Colors.grey, fontSize: 15),
-                ),
+              title: const Text(
+                "Location",
+                style: TextStyle(color: Colors.black, fontSize: 20),
               ),
-              ListTile(
-                leading: const Icon(
-                  Icons.email_sharp,
-                  color: Colors.redAccent,
-                  size: 25,
-                ),
-                title: const Text(
-                  "E-mail",
-                  style: TextStyle(color: Colors.black, fontSize: 20),
-                ),
-                subtitle: Text(
-                  email,
-                  style: const TextStyle(color: Colors.grey, fontSize: 15),
-                ),
+              subtitle: Text(
+                locaton,
+                style: TextStyle(color: Colors.grey, fontSize: 15),
               ),
-              ListTile(
-                leading: const Icon(
-                  Icons.phone,
-                  color: Colors.green,
-                  size: 25,
-                ),
-                title: const Text(
-                  "Phone",
-                  style: TextStyle(color: Colors.black, fontSize: 20),
-                ),
-                subtitle: Text(
-                  '$phoneNumber',
-                  style: const TextStyle(color: Colors.grey, fontSize: 15),
-                ),
+            ),
+            ListTile(
+              leading: const Icon(
+                Icons.email_sharp,
+                color: Colors.redAccent,
+                size: 25,
               ),
-            ],
-          ),
+              title: const Text(
+                "E-mail",
+                style: TextStyle(color: Colors.black, fontSize: 20),
+              ),
+              subtitle: Text(
+                email,
+                style: const TextStyle(color: Colors.grey, fontSize: 15),
+              ),
+            ),
+            ListTile(
+              leading: const Icon(
+                Icons.phone,
+                color: Colors.green,
+                size: 25,
+              ),
+              title: const Text(
+                "Phone",
+                style: TextStyle(color: Colors.black, fontSize: 20),
+              ),
+              subtitle: Text(
+                '+91 $phoneNumber',
+                style: const TextStyle(color: Colors.grey, fontSize: 15),
+              ),
+            ),
+          ],
         ),
       );
 
-  Future<void> retriveData() async {
-    print(uid);
-    setState(() {
-      print("Hey your id is $uid");
-      databaseRef.child('Users/all_users/$uid').once().then((value) {
 
-        if(value.snapshot!=null) {
-          Map<dynamic, dynamic>? map = value.snapshot.value as Map?;
-          fname = map!['first_name'];
-          lname = map['last_name'];
-          email = map['email'];
-          locaton = map['location'];
-          phoneNumber = map['mobile_number'];
-          print(fname);
-          print(lname);
-          print(email);
-          print(locaton);
-          print(phoneNumber);
-        }
-        else{
-          print(value.snapshot.value);
-        }
-
-      });
-    });
-  }
 }
 
 // const Card(

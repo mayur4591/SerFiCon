@@ -226,7 +226,7 @@ class _SignUpCustomerState extends State<SignUpCustomer> {
     }).onError((error, stackTrace) => {
           ScaffoldMessenger.of(context)
               .showSnackBar(SnackBar(content: Text('$error'))),
-      print(error)
+          print(error)
         });
     Navigator.push(context,
         MaterialPageRoute(builder: (context) => const SignInCustomer()));

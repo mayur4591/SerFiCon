@@ -1,9 +1,11 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
+import 'package:serficon/MainScreen/CustomerMenuPage.dart';
 import 'package:serficon/MainScreen/MessOwnerMenuPage.dart';
 import 'package:serficon/MainScreen/RoomOwnerMenuPage.dart';
 import 'package:serficon/Pages/signUpOwner.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class SignInOwner extends StatefulWidget {
   const SignInOwner({Key? key}) : super(key: key);
@@ -108,7 +110,7 @@ class _SignInOwnerState extends State<SignInOwner> {
                 height: 20,
               ),
               GestureDetector(
-                  onTap: () {
+                  onTap: () async {
                     if (emailController.text.isEmpty ||
                         passwordControll.text.isEmpty) {
                       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
@@ -123,7 +125,31 @@ class _SignInOwnerState extends State<SignInOwner> {
                         dismissDirection: DismissDirection.up,
                       ));
                     } else {
-                      doSignInOwner(emailController.text, passwordControll.text);
+                      //doSignInOwner(emailController.text, passwordControll.text);
+                      auth.signInWithEmailAndPassword(email: emailController.text, password: passwordControll.text);
+                      final SharedPreferences sharedPreferences=await SharedPreferences.getInstance();
+                      sharedPreferences.setString('email', emailController.text);
+                      databaseReference.child('Users').child('all_users').child(auth.currentUser!.uid).child('role').once().then((value) {
+                        var role=value.snapshot.value;
+                        if(role=='room_owner')
+                          {
+                            Navigator.push(context,MaterialPageRoute(builder: (context)=> const RoomOwnerMenuPage()));
+
+                          }
+                        else if(role=='mess_owner')
+                          {
+                            Navigator.push(context,MaterialPageRoute(builder: (context)=> const MessOwnerMenuPage()));
+
+                          }
+                        else if(role=='customer')
+                          {
+                            Navigator.push(context,MaterialPageRoute(builder: (context)=> const MenuPage()));
+
+                          }
+                      });
+                      // ignore: use_build_context_synchronously
+
+
                     }
                   },
                   child: Container(
@@ -173,20 +199,20 @@ class _SignInOwnerState extends State<SignInOwner> {
     );
   }
 
-  void doSignInOwner(String email, String password) {
-    auth.signInWithEmailAndPassword(email: email, password: password).then((value) {
-      databaseReference.child('Users/all_users/${auth.currentUser!.uid}/role').once().then((value) {
-        role=value.snapshot.value;
-        if(role=='room_owner')
-          {
-            Navigator.push(context,MaterialPageRoute(builder: (context)=> const RoomOwnerMenuPage()));
-          }
-        else if(role=='mess_owner')
-          {
-            Navigator.push(context,MaterialPageRoute(builder: (context)=> const MessOwnerMenuPage()));
-
-          }
-      });
-    });
-  }
+  // void doSignInOwner(String email, String password) {
+  //   auth.signInWithEmailAndPassword(email: email, password: password).then((value) {
+  //     databaseReference.child('Users/all_users/${auth.currentUser!.uid}/role').once().then((value) {
+  //       role=value.snapshot.value;
+  //       if(role=='room_owner')
+  //         {
+  //           Navigator.push(context,MaterialPageRoute(builder: (context)=> const RoomOwnerMenuPage()));
+  //         }
+  //       else if(role=='mess_owner')
+  //         {
+  //           Navigator.push(context,MaterialPageRoute(builder: (context)=> const MessOwnerMenuPage()));
+  //
+  //         }
+  //     });
+  //   });
+  // }
 }

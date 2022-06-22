@@ -1,4 +1,9 @@
+import 'dart:math';
+
 import 'package:expandable/expandable.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_database/firebase_database.dart';
+import 'package:firebase_database/ui/firebase_animated_list.dart';
 import 'package:flutter/material.dart';
 
 import '../Modal Classes/ristrictions_model.dart';
@@ -11,9 +16,10 @@ class About_Rules extends StatefulWidget {
 }
 
 class _About_RulesState extends State<About_Rules> {
-  List<RistrictionModel> rulesList = [];
   final titlecontroller = TextEditingController();
   final ruleController = TextEditingController();
+  late Query _ref;
+  final DatabaseReference reference=FirebaseDatabase.instance.reference();
 
   @override
   void dispose() {
@@ -21,16 +27,14 @@ class _About_RulesState extends State<About_Rules> {
     ruleController.dispose();
     super.dispose();
   }
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    _ref = FirebaseDatabase.instance.reference().child('Users/all_users/${FirebaseAuth.instance.currentUser!.uid}/ristrictions');
 
-  void addToList() {
-    RistrictionModel ristrictionModel =
-        RistrictionModel(titlecontroller.text, ruleController.text);
-
-    print(titlecontroller.text + ruleController.text);
-    setState(() {
-      rulesList.insert(0, ristrictionModel);
-    });
   }
+
 
   Future openDialoge() => showDialog(
         context: context,
@@ -93,7 +97,20 @@ class _About_RulesState extends State<About_Rules> {
                       behavior: SnackBarBehavior.floating,
                     ));
                   } else {
-                    addToList();
+
+
+                    var r=Random();
+                    var n1=r.nextInt(16);
+                    var n2=r.nextInt(15);
+                    if(n2>=n1)
+                    {
+                      n2=n2+1;
+                    }
+                    Map<String,dynamic> map={'ruletitle':titlecontroller.text.toString(),'ruledisc':ruleController.text.toString()};
+                    reference.child('Users/all_users/${FirebaseAuth.instance.currentUser!.uid}/ristrictions').child('rule$n2').update(map).then((value) {
+                      reference.child('Users/room_owners/${FirebaseAuth.instance.currentUser!.uid}/ristrictions').child('rule$n2').update(map);
+                    });
+
                     Navigator.of(context, rootNavigator: true).pop('dialog');
                     ruleController.text = '';
                     titlecontroller.text = '';
@@ -103,6 +120,26 @@ class _About_RulesState extends State<About_Rules> {
           ],
         ),
       );
+
+  Widget _buildListView(Map rule) {
+    return Card(
+        elevation: 2,
+        margin: const EdgeInsets.all(12),
+        child: ListTile(
+            title: ExpandablePanel(
+                header: Text(
+                  rule['ruletitle'],
+                  style: const TextStyle(
+                      fontSize: 25, color: Colors.black),
+                ),
+                collapsed: const Text(''),
+                expanded: Text(
+                  rule['ruledisc'],
+                  style: const TextStyle(
+                      fontSize: 20, color: Colors.grey),
+                ))));
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -122,51 +159,17 @@ class _About_RulesState extends State<About_Rules> {
             openDialoge();
           },
         ),
-        body: rulesList.isNotEmpty
-            ? ListView.builder(
-                itemBuilder: (BuildContext context, int index) {
-                  return Card(
-                      elevation: 2,
-                      margin: const EdgeInsets.all(12),
-                      child: ListTile(
-                          title: ExpandablePanel(
-                              header: Text(
-                                rulesList[index].title,
-                                style: const TextStyle(
-                                    fontSize: 25, color: Colors.black),
-                              ),
-                              collapsed: const Text(''),
-                              expanded: Text(
-                                '${rulesList[index].rule}',
-                                style: const TextStyle(
-                                    fontSize: 20, color: Colors.grey),
-                              ))));
-                },
-                itemCount: rulesList.length,
-              )
-            : Container(
-                color: Colors.white,
-                alignment: Alignment.center,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    GestureDetector(
-                        onTap: () {
-                          openDialoge();
-                        },
-                        child: const Icon(
-                          Icons.add_circle,
-                          size: 80,
-                          color: Colors.grey,
-                        )),
-                    const Text(
-                      'Add Rules',
-                      style: TextStyle(fontSize: 25, color: Colors.grey),
-                      textAlign: TextAlign.center,
-                    )
-                  ],
-                ))
-        //],
+        body: buildHome()
         );
+  }
+
+  Widget buildHome() {
+    return FirebaseAnimatedList(
+        query: _ref,
+        itemBuilder: (BuildContext cotext, DataSnapshot snapshot,
+            Animation<double> animation, int index) {
+          Map<dynamic, dynamic>? owners = snapshot.value as Map?;
+          return _buildListView(owners!);
+        });
   }
 }

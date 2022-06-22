@@ -26,44 +26,50 @@ class _StartingPageState extends State<StartingPage> {
                   ),
                   SizedBox(height: 30,),
 
-                  const SizedBox(height: 30),
+                  const SizedBox(height: 70),
                   const Center(child: Text('Who are you?',style: TextStyle(fontSize: 24,color: Colors.black,fontWeight: FontWeight.bold),)),
                   const SizedBox(height: 30,),
-                  GestureDetector(
-                    onTap: ()
-                    {
-                      Navigator.push(context, MaterialPageRoute(builder: (context)=> const SignInOwner()));
-                    },
-                    child: Container(
-                      width: MediaQuery.of(context).size.width/2,
-                      height: 60,
-                      margin: EdgeInsets.only(left: 30,right: 30),
-                      decoration:  BoxDecoration(
-                        color: Colors.blueAccent.withOpacity(0.8),
-                        borderRadius: BorderRadius.circular(25)
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      GestureDetector(
+                        onTap: ()
+                        {
+                          Navigator.push(context, MaterialPageRoute(builder: (context)=> const SignInOwner()));
+                        },
+                        child: Container(
+                          width: MediaQuery.of(context).size.width/1.5,
+                          height: 60,
+                          margin: EdgeInsets.only(left: 30,right: 30),
+                          decoration:  BoxDecoration(
+                              color: Colors.blueAccent.withOpacity(0.8),
+                              borderRadius: BorderRadius.circular(35)
 
-                    ),
-                      child: Center(child: const Text('Owner',style: TextStyle(fontSize: 30,color: Colors.white,fontWeight: FontWeight.bold),)),
-                    ),
-                  ),
-                  SizedBox(height: 10,),
-                  GestureDetector(
-                    onTap: ()
-                    {
-                      Navigator.push(context, MaterialPageRoute(builder: (context)=> const SignInCustomer()));
-
-                    },
-                    child: Container(
-                      margin: EdgeInsets.only(left: 30,right: 30),
-                      height: 60,
-                      width: MediaQuery.of(context).size.width/2,
-                      decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(25),
-                          color: Colors.blueAccent.withOpacity(0.8)
+                          ),
+                          child: Center(child: const Text('Owner',style: TextStyle(fontSize: 30,color: Colors.white,fontWeight: FontWeight.bold),)),
+                        ),
                       ),
-                      child: const Center(child: Text('Customer',style: TextStyle(fontSize: 30,color: Colors.white,fontWeight: FontWeight.bold))),
-                    ),
+                      SizedBox(height: 10,),
+                      GestureDetector(
+                        onTap: ()
+                        {
+                          Navigator.push(context, MaterialPageRoute(builder: (context)=> const SignInCustomer()));
+
+                        },
+                        child: Container(
+                          margin: EdgeInsets.only(left: 30,right: 30),
+                          height: 60,
+                          width: MediaQuery.of(context).size.width/1.5,
+                          decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(35),
+                              color: Colors.blueAccent.withOpacity(0.8)
+                          ),
+                          child: const Center(child: Text('Customer',style: TextStyle(fontSize: 30,color: Colors.white,fontWeight: FontWeight.bold))),
+                        ),
+                      )
+                    ],
                   )
+
                 ],
               ),
           ),

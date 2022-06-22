@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:serficon/Modals/ownerModal.dart';
+import 'package:serficon/Pages/signInOwner.dart';
 
 class SignUpOwner extends StatefulWidget {
   const SignUpOwner({Key? key}) : super(key: key);
@@ -334,7 +335,8 @@ class _SignUpOwnerState extends State<SignUpOwner> {
                     'email': data.email,
                     'location': data.location,
                     'mobile_number': data.mobileNo,
-                    'role': data.role
+                    'role': data.role,
+                    'id':auth.currentUser!.uid
                   })
                 }
               else if (data.role == 'mess_owner')
@@ -349,9 +351,12 @@ class _SignUpOwnerState extends State<SignUpOwner> {
                     'email': data.email,
                     'location': data.location,
                     'mobile_number': data.mobileNo,
-                    'role': data.role
+                    'role': data.role,
+                    'id':auth.currentUser!.uid
                   })
                 }
             });
+    Navigator.push(context, MaterialPageRoute(builder: (context)=>const SignInOwner()));
+
   }
 }

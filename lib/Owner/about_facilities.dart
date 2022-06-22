@@ -1,6 +1,9 @@
 import 'package:expandable/expandable.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_database/firebase_database.dart';
+import 'package:firebase_database/ui/firebase_animated_list.dart';
 import 'package:flutter/material.dart';
-
+import 'dart:math';
 import '../Modal Classes/ristrictions_model.dart';
 
 class About_Facilities extends StatefulWidget {
@@ -11,44 +14,43 @@ class About_Facilities extends StatefulWidget {
 }
 
 class _About_FacilitiesState extends State<About_Facilities> {
-  List<RistrictionModel> rulesList = [];
   final titlecontroller = TextEditingController();
-  final ruleController = TextEditingController();
+  final facilityController = TextEditingController();
+  // ignore: deprecated_member_use
+  final DatabaseReference reference=FirebaseDatabase.instance.reference();
+  late Query _ref;
 
   void dispose() {
     titlecontroller.dispose();
-    ruleController.dispose();
+    facilityController.dispose();
     super.dispose();
   }
-
-  void addToList() {
-    RistrictionModel ristrictionModel =
-        RistrictionModel(titlecontroller.text, ruleController.text);
-
-    print(titlecontroller.text + ruleController.text);
-    setState(() {
-      rulesList.insert(0, ristrictionModel);
-    });
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    // ignore: deprecated_member_use
+    _ref = FirebaseDatabase.instance.reference().child('Users/all_users/${FirebaseAuth.instance.currentUser!.uid}/facilities');
   }
 
   Future openDialoge() => showDialog(
         context: context,
         builder: (context) => AlertDialog(
           title: const Text('Enter Facility'),
-          content: Container(
+          content: SizedBox(
               height: 260,
               child: Column(
                 children: [
                   TextField(
-                    decoration: InputDecoration(
+                    decoration: const InputDecoration(
                       hintText: "Facility name",
                     ),
                     controller: titlecontroller,
                   ),
                   TextField(
                     decoration:
-                        InputDecoration(hintText: "Facility discription"),
-                    controller: ruleController,
+                        const InputDecoration(hintText: "Facility discription"),
+                    controller: facilityController,
                   ),
                   const SizedBox(
                     height: 30,
@@ -78,7 +80,8 @@ class _About_FacilitiesState extends State<About_Facilities> {
           actions: [
             TextButton(
                 onPressed: () {
-                  if (ruleController.text.isEmpty ||
+
+                  if (facilityController.text.isEmpty ||
                       titlecontroller.text.isEmpty) {
                     ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
                         content: Text(
@@ -89,16 +92,44 @@ class _About_FacilitiesState extends State<About_Facilities> {
                         elevation: 2,
                         behavior: SnackBarBehavior.floating));
                   } else {
-                    addToList();
-                    Navigator.of(context, rootNavigator: true).pop('dialog');
-                    ruleController.text = '';
-                    titlecontroller.text = '';
+                    var r=Random();
+                    var n1=r.nextInt(16);
+                    var n2=r.nextInt(15);
+                    if(n2>=n1)
+                      {
+                        n2=n2+1;
+                      }
+                    Map<String,dynamic> map={'title':titlecontroller.text.toString(),'facility':facilityController.text.toString()};
+                    reference.child('Users/all_users/${FirebaseAuth.instance.currentUser!.uid}/facilities').child('facility$n2').update(map).then((value) {
+                      reference.child('Users/room_owners/${FirebaseAuth.instance.currentUser!.uid}/facilities').child('facility$n2').update(map);
+                    });
+
+                        Navigator.pop(context,false);
                   }
                 },
                 child: const Text('ADD'))
           ],
         ),
       );
+
+  Widget _buildListView(Map facility) {
+    return Card(
+        elevation: 2,
+        margin: const EdgeInsets.all(12),
+        child: ListTile(
+            title: ExpandablePanel(
+                header: Text(
+                  facility['title'],
+                  style: const TextStyle(
+                      fontSize: 25, color: Colors.black),
+                ),
+                collapsed: const Text(''),
+                expanded: Text(
+                  facility['facility'],
+                  style: const TextStyle(
+                      fontSize: 20, color: Colors.grey),
+                ))));
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -106,7 +137,7 @@ class _About_FacilitiesState extends State<About_Facilities> {
           automaticallyImplyLeading: false,
           backgroundColor: Colors.green.withOpacity(0.6),
           elevation: 1,
-          title: Text(
+          title: const Text(
             'Facilities',
             style: TextStyle(color: Colors.black, fontSize: 25),
           ),
@@ -117,51 +148,21 @@ class _About_FacilitiesState extends State<About_Facilities> {
             openDialoge();
           },
         ),
-        body: rulesList.length != 0
-            ? ListView.builder(
-                itemBuilder: (BuildContext context, int index) {
-                  return Card(
-                      elevation: 2,
-                      margin: EdgeInsets.all(12),
-                      child: ListTile(
-                          title: ExpandablePanel(
-                              header: Text(
-                                '${rulesList[index].title}',
-                                style: const TextStyle(
-                                    fontSize: 25, color: Colors.black),
-                              ),
-                              collapsed: const Text(''),
-                              expanded: Text(
-                                '${rulesList[index].rule}',
-                                style: const TextStyle(
-                                    fontSize: 20, color: Colors.grey),
-                              ))));
-                },
-                itemCount: rulesList.length,
-              )
-            : Container(
-                color: Colors.white,
-                alignment: Alignment.center,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    GestureDetector(
-                        onTap: () {
-                          openDialoge();
-                        },
-                        child: Icon(
-                          Icons.add_circle,
-                          size: 80,
-                          color: Colors.grey,
-                        )),
-                    Text(
-                      'Add Facilities',
-                      style: TextStyle(fontSize: 25, color: Colors.grey),
-                      textAlign: TextAlign.center,
-                    )
-                  ],
-                ))
-        //],
-        );
+        body: buildHome()
+
+      //],
+    );
   }
+
+
+  Widget buildHome() {
+    return FirebaseAnimatedList(
+        query: _ref,
+        itemBuilder: (BuildContext cotext, DataSnapshot snapshot,
+            Animation<double> animation, int index) {
+          Map<dynamic, dynamic>? owners = snapshot.value as Map?;
+          return _buildListView(owners!);
+        });
+  }
+
 }

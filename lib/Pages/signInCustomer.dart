@@ -5,6 +5,9 @@ import 'package:serficon/MainScreen/CustomerMenuPage.dart';
 import 'package:serficon/Pages/signUpCustomer.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../MainScreen/MessOwnerMenuPage.dart';
+import '../MainScreen/RoomOwnerMenuPage.dart';
+
 class SignInCustomer extends StatefulWidget {
   const SignInCustomer({Key? key}) : super(key: key);
 
@@ -126,12 +129,28 @@ class _SignInCustomerState extends State<SignInCustomer> {
                     } else {
                       // doSignInCustomer(
                       //     emailController.text, passwordControll.text);
-                      // auth.signInWithEmailAndPassword(email: emailController.text.toString(), password: passwordControll.text.toString());
-                      // final SharedPreferences sharedPreferences=await SharedPreferences.getInstance();
-                      // sharedPreferences.setString('email', emailController.text);
-                      // // ignore: use_build_context_synchronously
-                      // Navigator.push(context,MaterialPageRoute(builder: (context)=> const MenuPage()));
+                      auth.signInWithEmailAndPassword(email: emailController.text, password: passwordControll.text);
+                      final SharedPreferences sharedPreferences=await SharedPreferences.getInstance();
+                      sharedPreferences.setString('email', emailController.text);
+                      // ignore: use_build_context_synchronously
+                      databaseReference.child('Users').child('all_users').child(auth.currentUser!.uid).child('role').once().then((value) {
+                        var role=value.snapshot.value;
+                        if(role=='room_owner')
+                        {
+                          Navigator.push(context,MaterialPageRoute(builder: (context)=> const RoomOwnerMenuPage()));
 
+                        }
+                        else if(role=='mess_owner')
+                        {
+                          Navigator.push(context,MaterialPageRoute(builder: (context)=> const MessOwnerMenuPage()));
+
+                        }
+                        else if(role=='customer')
+                        {
+                          Navigator.push(context,MaterialPageRoute(builder: (context)=> const MenuPage()));
+
+                        }
+                      });
                     }
                   },
                   child: Container(

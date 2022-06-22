@@ -1,4 +1,6 @@
 import 'package:expandable/expandable.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 
 // ignore: camel_case_types
@@ -17,6 +19,11 @@ class _About_RoomsState extends State<About_Rooms> {
   final currentlyAvalableRoomsController = TextEditingController();
   final availableRoomTypesController = TextEditingController();
 
+
+  // ignore: deprecated_member_use
+  final DatabaseReference reference=FirebaseDatabase.instance.reference();
+  late FirebaseAuth auth;
+
   String numberOfRooms = "Add information.";
   String roomRents = "Add information.";
   String roomAvailiblity = "Add information.";
@@ -30,6 +37,34 @@ class _About_RoomsState extends State<About_Rooms> {
     roomAvailablityController.dispose();
     currentlyAvalableRoomsController.dispose();
     super.dispose();
+  }
+  Future<void> getData() async {
+    await reference.child('Users/all_users/${auth.currentUser!.uid}/about_rooms').once().then((value) {
+      setState((){
+        if(value.snapshot!=null) {
+          Map<dynamic, dynamic>? map = value.snapshot.value as Map?;
+          availableRoomTypes=map!['available_room_types']??'Add information';
+          numberOfRooms=map['total_number_of_rooms']??'Add information';
+          currentlyAvailableRooms=map['currently_available_rooms']??'Add information';
+          roomRents=map['room_rents']??'Add information';
+          roomAvailiblity=map['rooms_available_for']??'Add information';
+        }
+        else{
+          print(value.snapshot.value);
+        }
+      });
+    });
+  }
+  var uid;
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    auth=FirebaseAuth.instance;
+    final User? user = auth.currentUser;
+    uid = user!.uid;
+
+    getData();
   }
 
   @override
@@ -119,6 +154,11 @@ class _About_RoomsState extends State<About_Rooms> {
                                     setState(() {
                                       availableRoomTypes =
                                           availableRoomTypesController.text;
+                                        Map<String,dynamic> map={'available_room_types':availableRoomTypes.toString()};
+                                      reference.child('Users').child('all_users').child(auth.currentUser!.uid).child('about_rooms').update(map).then((value) {
+                                        reference.child('Users').child('room_owners').child(auth.currentUser!.uid).child('about_rooms').update(map);
+                                      });
+                                      Navigator.pop(context, false);
                                       ScaffoldMessenger.of(context)
                                           .showSnackBar(const SnackBar(
                                         content: Text(
@@ -127,8 +167,6 @@ class _About_RoomsState extends State<About_Rooms> {
                                                 TextStyle(color: Colors.white)),
                                         backgroundColor: Colors.green,
                                       ));
-                                      availableRoomTypesController.text = '';
-                                      Navigator.pop(context, false);
                                     });
                                   }
                                 },
@@ -202,7 +240,16 @@ class _About_RoomsState extends State<About_Rooms> {
                                         setState(() {
                                           numberOfRooms =
                                               roomNumberController.text;
-                                          ScaffoldMessenger.of(context)
+                                          Map<String,dynamic> map={'total_number_of_rooms':numberOfRooms.toString()};
+                                          reference.child('Users').child('all_users').child(auth.currentUser!.uid).child('about_rooms').update(map).then((value) {
+                                            reference.child('Users').child(
+                                                'room_owners').child(
+                                                auth.currentUser!.uid).child(
+                                                'about_rooms').update(map);
+                                          });
+                                          Navigator.pop(context, false);
+
+                                            ScaffoldMessenger.of(context)
                                               .showSnackBar(const SnackBar(
                                             content: Text(
                                                 'Information added sucsesfully...',
@@ -210,8 +257,6 @@ class _About_RoomsState extends State<About_Rooms> {
                                                     color: Colors.white)),
                                             backgroundColor: Colors.green,
                                           ));
-                                          roomNumberController.text = '';
-                                          Navigator.pop(context, false);
                                         });
                                       }
                                     },
@@ -286,6 +331,16 @@ class _About_RoomsState extends State<About_Rooms> {
                                           currentlyAvailableRooms =
                                               currentlyAvalableRoomsController
                                                   .text;
+
+                                          Map<String,dynamic> map={'currently_available_rooms':currentlyAvailableRooms.toString()};
+                                          reference.child('Users').child('all_users').child(auth.currentUser!.uid).child('about_rooms').update(map).then((value) {
+                                            reference.child('Users').child(
+                                                'room_owners').child(
+                                                auth.currentUser!.uid).child(
+                                                'about_rooms').update(map);
+                                          });
+
+                                          Navigator.pop(context, false);
                                           ScaffoldMessenger.of(context)
                                               .showSnackBar(const SnackBar(
                                             content: Text(
@@ -294,9 +349,7 @@ class _About_RoomsState extends State<About_Rooms> {
                                                     color: Colors.white)),
                                             backgroundColor: Colors.green,
                                           ));
-                                          currentlyAvalableRoomsController
-                                              .text = '';
-                                          Navigator.pop(context, false);
+
                                         });
                                       }
                                     },
@@ -388,6 +441,17 @@ class _About_RoomsState extends State<About_Rooms> {
                                       } else {
                                         setState(() {
                                           roomRents = roomRentController.text;
+
+                                          Map<String,dynamic> map={'room_rents':roomRents.toString()};
+                                          reference.child('Users').child('all_users').child(auth.currentUser!.uid).child('about_rooms').update(map).then((value) {
+                                            reference.child('Users').child(
+                                                'room_owners').child(
+                                                auth.currentUser!.uid).child(
+                                                'about_rooms').update(map);
+                                          });
+
+
+
                                           ScaffoldMessenger.of(context)
                                               .showSnackBar(const SnackBar(
                                             content: Text(
@@ -396,7 +460,6 @@ class _About_RoomsState extends State<About_Rooms> {
                                                     color: Colors.white)),
                                             backgroundColor: Colors.green,
                                           ));
-                                          roomRentController.text = '';
                                           Navigator.pop(context, false);
                                         });
                                       }
@@ -472,6 +535,15 @@ class _About_RoomsState extends State<About_Rooms> {
                                         setState(() {
                                           roomAvailiblity =
                                               roomAvailablityController.text;
+
+                                          Map<String,dynamic> map={'rooms_available_for':roomAvailiblity.toString()};
+                                          reference.child('Users').child('all_users').child(auth.currentUser!.uid).child('about_rooms').update(map).then((value) {
+                                            reference.child('Users').child(
+                                                'room_owners').child(
+                                                auth.currentUser!.uid).child(
+                                                'about_rooms').update(map);
+                                          });
+                                          Navigator.pop(context, false);
                                           ScaffoldMessenger.of(context)
                                               .showSnackBar(const SnackBar(
                                             content: Text(
@@ -480,7 +552,6 @@ class _About_RoomsState extends State<About_Rooms> {
                                                     color: Colors.white)),
                                             backgroundColor: Colors.green,
                                           ));
-                                          Navigator.pop(context, false);
                                         });
                                       }
                                     },
