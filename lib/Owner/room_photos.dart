@@ -83,7 +83,7 @@ class _Room_PhotosState extends State<Room_Photos> {
         n2 = n2 + 1;
       }
       final profile =
-          await ImagePicker().pickImage(source: ImageSource.gallery);
+          await ImagePicker().pickImage(source: ImageSource.camera);
       Reference ref = FirebaseStorage.instance
           .ref()
           .child('room_owner')
