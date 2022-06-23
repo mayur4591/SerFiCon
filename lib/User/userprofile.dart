@@ -7,9 +7,7 @@ import 'package:image_picker/image_picker.dart';
 import 'Userdrawer.dart';
 import 'bookmarks.dart';
 
-
 class UserProfile extends StatefulWidget {
-
   @override
   State<UserProfile> createState() => _UserProfileState();
 }
@@ -19,8 +17,8 @@ class _UserProfileState extends State<UserProfile> {
   final databaseRef = FirebaseDatabase.instance.reference();
   var userImage;
   late FirebaseAuth _auth;
-  var fname='loading...';
-  var lname='';
+  var fname = 'loading...';
+  var lname = '';
   var uid;
 
   // get databaseRef => null;
@@ -36,6 +34,7 @@ class _UserProfileState extends State<UserProfile> {
       });
     });
   }
+
   @override
 
   // ignore: deprecated_member_use
@@ -94,11 +93,10 @@ class _UserProfileState extends State<UserProfile> {
         appBar: AppBar(
           elevation: 0,
           automaticallyImplyLeading: false,
-          backgroundColor: Colors.blueAccent.withOpacity(0.4),
+          backgroundColor: Colors.deepPurple.withOpacity(0.2),
           title: const Text(
             "Profile",
-            style: TextStyle(
-                fontSize: 25,color: Colors.black),
+            style: TextStyle(fontSize: 25, color: Colors.black),
           ),
         ),
         endDrawer: const UserDrawer(),

@@ -20,6 +20,7 @@ class _About_RulesState extends State<About_Rules> {
   final ruleController = TextEditingController();
   late Query _ref;
   final DatabaseReference reference=FirebaseDatabase.instance.reference();
+  bool isloding=false;
 
   @override
   void dispose() {
@@ -97,7 +98,9 @@ class _About_RulesState extends State<About_Rules> {
                       behavior: SnackBarBehavior.floating,
                     ));
                   } else {
-
+                    setState((){
+                      isloding=true;
+                    });
                     var r=Random();
                     var n1=r.nextInt(16);
                     var n2=r.nextInt(15);
@@ -114,6 +117,9 @@ class _About_RulesState extends State<About_Rules> {
                     ruleController.text = '';
                     titlecontroller.text = '';
                   }
+                  setState((){
+                    isloding=false;
+                  });
                 },
                 child: const Text('ADD'))
           ],
@@ -158,7 +164,11 @@ class _About_RulesState extends State<About_Rules> {
             openDialoge();
           },
         ),
-        body: buildHome()
+        body: isloding==false?buildHome():Center(child: Column(mainAxisAlignment: MainAxisAlignment.center,children: [
+          CircularProgressIndicator(color: Colors.blueAccent,),
+          SizedBox(height: 20,),
+          Text('Uploading...',style: TextStyle(color: Colors.grey,fontSize: 20),)
+        ],),)
         );
   }
 

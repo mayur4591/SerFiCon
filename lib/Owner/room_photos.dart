@@ -16,11 +16,13 @@ class Room_Photos extends StatefulWidget {
 }
 
 // ignore: camel_case_types
+bool isloding=false;
+
 class _Room_PhotosState extends State<Room_Photos> {
   final imagePicker = ImagePicker();
   late FirebaseAuth auth;
   var image;
-  late Query _ref;
+  bool isloding=false;
 
   Future chooseImage(String name) async {
     if (name == 'Gallery') {
@@ -33,6 +35,9 @@ class _Room_PhotosState extends State<Room_Photos> {
       if (n2 >= n1) {
         n2 = n2 + 1;
       }
+      setState((){
+        isloding=true;
+      });
       Reference ref = FirebaseStorage.instance
           .ref()
           .child('room_owner')
@@ -74,6 +79,9 @@ class _Room_PhotosState extends State<Room_Photos> {
           // image = url;
         });
       });
+      setState((){
+        isloding=false;
+      });
     } else if (name == 'Camera') {
       String? url;
       var r = Random();
@@ -84,6 +92,10 @@ class _Room_PhotosState extends State<Room_Photos> {
       }
       final profile =
           await ImagePicker().pickImage(source: ImageSource.camera);
+
+      setState((){
+        isloding=true;
+      });
       Reference ref = FirebaseStorage.instance
           .ref()
           .child('room_owner')
@@ -122,6 +134,9 @@ class _Room_PhotosState extends State<Room_Photos> {
           // print(value);
           // image = url;
         });
+      });
+      setState((){
+        isloding=false;
       });
     }
   }
@@ -178,44 +193,32 @@ class _Room_PhotosState extends State<Room_Photos> {
             ),
           ],
         ),
-        body:buildHome()
+        body:isloding==false?buildHome():Center(child: Column(mainAxisAlignment: MainAxisAlignment.center,children: [
+          CircularProgressIndicator(color: Colors.blueAccent,),
+          SizedBox(height: 20,),
+          Text('Uploading...',style: TextStyle(color: Colors.grey,fontSize: 20),)
+        ],),)
         );
 
   }
 }
 
 Widget buildHome() {
-  return FirebaseAnimatedList(
+  return isloding==false?FirebaseAnimatedList(
       query: FirebaseDatabase.instance.reference().child(
           'Users/all_users/${FirebaseAuth.instance.currentUser!.uid}/room_photos'),
       itemBuilder: (BuildContext cotext, DataSnapshot snapshot,
           Animation<double> animation, int index) {
         Map<dynamic, dynamic>? owners = snapshot.value as Map?;
         return _buildListView(owners!);
-      });
+      }):Center(child: Column(mainAxisAlignment: MainAxisAlignment.center,children: [
+    CircularProgressIndicator(color: Colors.blueAccent,),
+    SizedBox(height: 20,),
+    Text('Uploading...',style: TextStyle(color: Colors.grey,fontSize: 20),)
+  ],),);
 }
 
-// class roomPhotos extends StatefulWidget {
-//   const roomPhotos({Key? key}) : super(key: key);
-//
-//   @override
-//   State<roomPhotos> createState() => _roomPhotosState();
-// }
-//
-// class _roomPhotosState extends State<roomPhotos> {
-//   @override
-//   void initState() {
-//     // TODO: implement initState
-//     super.initState();
-//     // ignore: deprecated_member_use
-//
-//   }
-//
-//   @override
-//   Widget build(BuildContext context) {
-//     return
-//   }
-// }
+
 
 Widget _buildListView(Map photos) {
   print(photos.length);
@@ -230,24 +233,4 @@ Widget _buildListView(Map photos) {
     ),
   );
 }
-
-// class Viewer extends StatelessWidget {
-//   final File image;
-//   const Viewer({Key? key, required this.image}) : super(key: key);
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//         backgroundColor: Colors.black12,
-//         body: Padding(
-//             padding: const EdgeInsets.all(10),
-//             child: Card(
-//                 elevation: 2,
-//                 child: Container(
-//                     color: Colors.black12,
-//                     alignment: Alignment.center,
-//                     child: Image(
-//                       image: FileImage(image),
-//                       fit: BoxFit.fill,
-//                     )))));
-//   }
 

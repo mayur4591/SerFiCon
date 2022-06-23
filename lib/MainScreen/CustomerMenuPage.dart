@@ -19,6 +19,7 @@ class MenuPage extends StatefulWidget {
 
 class _MenuPageState extends State<MenuPage> {
   var role;
+  bool isloding=false;
   @override
   void initState() {
     // TODO: implement initState
@@ -26,11 +27,10 @@ class _MenuPageState extends State<MenuPage> {
     // ignore: deprecated_member_use
     findRole();
   }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: CustomScrollView(
+      body: isloding==false?CustomScrollView(
         slivers: <Widget>[
           SliverAppBar(
             title: Row(
@@ -89,10 +89,16 @@ class _MenuPageState extends State<MenuPage> {
                 children: [
                   GestureDetector(
                     onTap: () {
+                      setState((){
+                        isloding=true;
+                      });
                       Navigator.push(
                           context,
                           MaterialPageRoute(
                               builder: (context) => const Home()));
+                      setState((){
+                        isloding=false;
+                      });
                     },
                     child: Card(
                       elevation: 0,
@@ -124,10 +130,16 @@ class _MenuPageState extends State<MenuPage> {
                   ),
                   GestureDetector(
                     onTap: () {
+                      setState((){
+                        isloding=true;
+                      });
                       Navigator.push(
                           context,
                           MaterialPageRoute(
                               builder: (context) => const MessOwners()));
+                      setState((){
+                        isloding=false;
+                      });
                     },
                     child: Card(
                       elevation: 0,
@@ -165,14 +177,27 @@ class _MenuPageState extends State<MenuPage> {
             ),
           )
         ],
-      ),
+      ):Center(child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          CircularProgressIndicator(color: Colors.blueAccent,),
+          SizedBox(height: 20,),
+          Text('Loading...',style: TextStyle(color: Colors.grey,fontSize: 20),)
+        ],
+      )),
     );
   }
 
   void goToProfile() {
-
+    setState((){
+      isloding=true;
+    });
       Navigator.push(
           context, MaterialPageRoute(builder: (context) => UserProfile()));
+
+    setState((){
+      isloding=false;
+    });
 
   }
 

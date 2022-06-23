@@ -14,6 +14,8 @@ class About_Facilities extends StatefulWidget {
 }
 
 class _About_FacilitiesState extends State<About_Facilities> {
+  bool loading=false;
+
   final titlecontroller = TextEditingController();
   final facilityController = TextEditingController();
   // ignore: deprecated_member_use
@@ -92,6 +94,9 @@ class _About_FacilitiesState extends State<About_Facilities> {
                         elevation: 2,
                         behavior: SnackBarBehavior.floating));
                   } else {
+                    setState((){
+                      loading=true;
+                    });
                     var r=Random();
                     var n1=r.nextInt(16);
                     var n2=r.nextInt(15);
@@ -106,6 +111,9 @@ class _About_FacilitiesState extends State<About_Facilities> {
 
                         Navigator.pop(context,false);
                   }
+                  setState((){
+                    loading=false;
+                  });
                 },
                 child: const Text('ADD'))
           ],
@@ -148,8 +156,11 @@ class _About_FacilitiesState extends State<About_Facilities> {
             openDialoge();
           },
         ),
-        body: buildHome()
-
+        body: loading==false?buildHome():Center(child: Column(mainAxisAlignment: MainAxisAlignment.center,children: [
+          CircularProgressIndicator(color: Colors.blueAccent,),
+          SizedBox(height: 20,),
+          Text('Uploading...',style: TextStyle(color: Colors.grey,fontSize: 20),)
+        ],),)
       //],
     );
   }

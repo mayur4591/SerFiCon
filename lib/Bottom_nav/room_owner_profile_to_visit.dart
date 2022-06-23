@@ -1,11 +1,7 @@
-import 'dart:io';
-import 'package:expandable/expandable.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:serficon/Bottom_nav/roomOwnerList.dart';
-
 import '../About/about_rooms.dart';
 import '../About/facilities.dart';
 import '../About/photos.dart';
@@ -23,6 +19,7 @@ class _OwnerProfileToVisitState extends State<OwnerProfileToVisit> {
   final double coverHeight = 280;
   final double profileHeight = 144;
   final double bottom = 80;
+  bool isloding = false;
   // ignore: deprecated_member_use
   final DatabaseReference reference = FirebaseDatabase.instance.reference();
   late FirebaseAuth auth;
@@ -92,91 +89,131 @@ class _OwnerProfileToVisitState extends State<OwnerProfileToVisit> {
     auth = FirebaseAuth.instance;
     final User? user = auth.currentUser;
     uid = user!.uid;
+    setState(() {
+      isloding = true;
+    });
     getProfile();
     getData();
+
+    setState(() {
+      isloding = false;
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.blueAccent.withOpacity(0.3),
+        backgroundColor: Colors.deepPurple.withOpacity(0.4),
         elevation: 0,
-        title: const Text('Profile',style: TextStyle(color: Colors.black),),
+        title: const Text(
+          'Profile',
+          style: TextStyle(color: Colors.black),
+        ),
       ),
-        body: ListView(
-      children: [
-        buildTop(),
-        buildInfo(),
-        GestureDetector(
-            onTap: () {
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => const Rooms()));
-            },
-            child: const Card(
-                elevation: 1,
-                child: ListTile(
-                  title: Text('About Rooms',
-                      style: TextStyle(color: Colors.black, fontSize: 25)),
-                  trailing: Icon(
-                    Icons.arrow_forward_ios_outlined,
-                    color: Colors.grey,
-                    size: 25,
-                  ),
-                ))),
-        GestureDetector(
-          onTap: () {
-            Navigator.push(context,
-                MaterialPageRoute(builder: (context) => const Facilities()));
-          },
-          child: const Card(
-              elevation: 1,
-              child: ListTile(
-                title: Text('Facilities',
-                    style: TextStyle(color: Colors.black, fontSize: 25)),
-                trailing: Icon(
-                  Icons.arrow_forward_ios_outlined,
-                  color: Colors.grey,
-                  size: 25,
+      body: isloding == false
+          ? ListView(
+              children: [
+                buildTop(),
+                buildInfo(),
+                GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const Rooms()));
+                    },
+                    child: const Card(
+                        elevation: 1,
+                        child: ListTile(
+                          title: Text('About Rooms',
+                              style:
+                                  TextStyle(color: Colors.black, fontSize: 25)),
+                          trailing: Icon(
+                            Icons.arrow_forward_ios_outlined,
+                            color: Colors.grey,
+                            size: 25,
+                          ),
+                        ))),
+                GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const Facilities()));
+                  },
+                  child: const Card(
+                      elevation: 1,
+                      child: ListTile(
+                        title: Text('Facilities',
+                            style:
+                                TextStyle(color: Colors.black, fontSize: 25)),
+                        trailing: Icon(
+                          Icons.arrow_forward_ios_outlined,
+                          color: Colors.grey,
+                          size: 25,
+                        ),
+                      )),
                 ),
-              )),
-        ),
-        GestureDetector(
-          onTap: () {
-            Navigator.push(context,
-                MaterialPageRoute(builder: (context) => const Photos()));
-          },
-          child: const Card(
-              elevation: 1,
-              child: ListTile(
-                title: Text('Photos',
-                    style: TextStyle(color: Colors.black, fontSize: 25)),
-                trailing: Icon(
-                  Icons.arrow_forward_ios_outlined,
-                  color: Colors.grey,
-                  size: 25,
+                GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const Photos()));
+                  },
+                  child: const Card(
+                      elevation: 1,
+                      child: ListTile(
+                        title: Text('Photos',
+                            style:
+                                TextStyle(color: Colors.black, fontSize: 25)),
+                        trailing: Icon(
+                          Icons.arrow_forward_ios_outlined,
+                          color: Colors.grey,
+                          size: 25,
+                        ),
+                      )),
                 ),
-              )),
-        ),
-        GestureDetector(
-          onTap: () {
-            Navigator.push(context,
-                MaterialPageRoute(builder: (context) => const Ristrictions()));
-          },
-          child: const Card(
-              elevation: 1,
-              child: ListTile(
-                title: Text('Rules & Ristrictions',
-                    style: TextStyle(color: Colors.black, fontSize: 25)),
-                trailing: Icon(
-                  Icons.arrow_forward_ios_outlined,
-                  color: Colors.grey,
-                  size: 25,
+                GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const Ristrictions()));
+                  },
+                  child: const Card(
+                      elevation: 1,
+                      child: ListTile(
+                        title: Text('Rules & Ristrictions',
+                            style:
+                                TextStyle(color: Colors.black, fontSize: 25)),
+                        trailing: Icon(
+                          Icons.arrow_forward_ios_outlined,
+                          color: Colors.grey,
+                          size: 25,
+                        ),
+                      )),
+                )
+              ],
+            )
+          : Center(
+              child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                CircularProgressIndicator(
+                  color: Colors.blueAccent,
                 ),
-              )),
-        )
-      ],
-    ));
+                SizedBox(
+                  height: 20,
+                ),
+                Text(
+                  'Loading...',
+                  style: TextStyle(color: Colors.grey, fontSize: 20),
+                )
+              ],
+            )),
+    );
   }
 
   Image getProfile() {
@@ -216,8 +253,6 @@ class _OwnerProfileToVisitState extends State<OwnerProfileToVisit> {
               const SizedBox(
                 height: 5,
               ),
-
-
             ],
           ),
         ),

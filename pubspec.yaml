@@ -27,6 +27,7 @@ environment:
 # the latest version available on pub.dev. To see which dependencies have newer
 # versions available, run `flutter pub outdated`.
 dependencies:
+  another_flushbar: ^1.10.29
   firebase_storage: ^10.2.18
   smooth_page_indicator: ^1.0.0+2
   shared_preferences: ^2.0.15

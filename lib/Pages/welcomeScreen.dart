@@ -25,7 +25,7 @@ class _WelcomeState extends State<Welcome> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
-        padding: const EdgeInsets.only(bottom: 80),
+        padding:  EdgeInsets.only(bottom: 80),
         child: PageView(
           controller: contoller,
           onPageChanged: (index) {
@@ -103,7 +103,7 @@ class _WelcomeState extends State<Welcome> {
             TextButton(
                 onPressed: () {
                   if (string == 'Get Started') {
-                    Navigator.push(
+                    Navigator.pushReplacement(
                         context,
                         MaterialPageRoute(
                             builder: (context) => const StartingPage()));

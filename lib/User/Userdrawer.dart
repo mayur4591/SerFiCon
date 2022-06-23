@@ -19,16 +19,29 @@ class _UserDrawerState extends State<UserDrawer> {
   final ref = FirebaseDatabase.instance.reference();
   var uid = FirebaseAuth.instance.currentUser!.uid;
   var fname = 'loading...', lname = '', email = 'loading...';
+  var image;
+  String url='';
   @override
+  Future<void> fetch() async {
+    await ref.child('Users/all_users/$uid').once().then((event) async {
+      setState((){
+        Map<dynamic, dynamic> map = event.snapshot.value as Map;
+        fname = map['first_name'];
+        lname = map['last_name'];
+        email = map['email'];
+        url=map['profile_image']??'';
+        image=NetworkImage(url);
+      });
+
+    });
+  }
   void initState() {
     // TODO: implement initState
     super.initState();
     fetch();
   }
-
   @override
   Widget build(BuildContext context) {
-    fetch();
     return Container(
         width: MediaQuery.of(context).size.width / 1.4,
         color: Colors.white,
@@ -37,11 +50,12 @@ class _UserDrawerState extends State<UserDrawer> {
             height: 250,
             color: Colors.blue.withOpacity(0.7),
             child:
-                Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-              const CircleAvatar(
-                radius: 50,
-                backgroundImage: AssetImage('assets/images/profile_png.jpg'),
-              ),
+                Column(
+                    mainAxisAlignment: MainAxisAlignment.center, children: [
+                  CircleAvatar(
+                      radius: 50,
+                      backgroundImage: url!=''?image:AssetImage('assets/images/profile_png.jpg')
+                  ),
               const SizedBox(
                 height: 10,
               ),
@@ -115,12 +129,5 @@ class _UserDrawerState extends State<UserDrawer> {
         ]));
   }
 
-  Future<void> fetch() async {
-    await ref.child('Users/all_users/$uid').once().then((event) async {
-      Map<dynamic, dynamic> map = event.snapshot.value as Map;
-      fname = map['first_name'];
-      lname = map['last_name'];
-      email = map['email'];
-    });
-  }
+
 }

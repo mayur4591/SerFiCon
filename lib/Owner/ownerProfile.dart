@@ -19,6 +19,7 @@ class OwnerProfile extends StatefulWidget {
 }
 
 class _OwnerProfileState extends State<OwnerProfile> {
+  bool isloding=false;
   var image;
   var fname = 'loading...';
   var lname = '';
@@ -70,6 +71,9 @@ class _OwnerProfileState extends State<OwnerProfile> {
 
       final profile =
           await ImagePicker().pickImage(source: ImageSource.gallery);
+      setState((){
+        isloding=true;
+      });
       // ignore: deprecated_member_use
       Reference ref = FirebaseStorage.instance
           .ref()
@@ -107,10 +111,17 @@ class _OwnerProfileState extends State<OwnerProfile> {
           image = url;
         });
       });
+      setState((){
+        isloding=false;
+      });
     } else if (name == 'Camera') {
       String? url;
       final profile =
           await ImagePicker().pickImage(source: ImageSource.gallery);
+
+      setState((){
+        isloding=true;
+      });
       Reference ref = FirebaseStorage.instance
           .ref()
           .child('room_owner')
@@ -147,6 +158,9 @@ class _OwnerProfileState extends State<OwnerProfile> {
           image = url;
         });
       });
+      setState((){
+        isloding=false;
+      });
     }
   }
 
@@ -166,8 +180,14 @@ class _OwnerProfileState extends State<OwnerProfile> {
     // ignore: deprecated_member_use
     final User? user = auth.currentUser;
     uid = user!.uid;
+    setState((){
+      isloding=true;
+    });
     getProfile();
     retriveData();
+    setState((){
+      isloding=false;
+    });
   }
 
   @override
@@ -178,10 +198,10 @@ class _OwnerProfileState extends State<OwnerProfile> {
           title: const Text(
             'Profile',
           ),
-          backgroundColor: Colors.blueAccent.withOpacity(0.5),
+          backgroundColor: Colors.deepPurple.withOpacity(0.4),
         ),
         endDrawer: const NavigationDrawer(),
-        body: ListView(
+        body: isloding == false? ListView(
           children: [
             buildTop(),
             buildInfo(),
@@ -224,6 +244,7 @@ class _OwnerProfileState extends State<OwnerProfile> {
             ),
             GestureDetector(
               onTap: () {
+
                 Navigator.push(
                     context,
                     MaterialPageRoute(
@@ -261,6 +282,15 @@ class _OwnerProfileState extends State<OwnerProfile> {
                   )),
             )
           ],
+        ):Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              CircularProgressIndicator(color: Colors.blueAccent,),
+              SizedBox(height: 10,),
+              Text('Loading...',style: TextStyle(color: Colors.grey,fontSize: 20),),
+            ],
+          ),
         ));
   }
 
@@ -331,8 +361,6 @@ class _OwnerProfileState extends State<OwnerProfile> {
                 const SizedBox(
                   height: 15,
                 ),
-
-
               ],
             ),
           ),
@@ -346,7 +374,7 @@ class _OwnerProfileState extends State<OwnerProfile> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Card(
-              elevation: 0,
+                elevation: 0,
                 child: Column(
                   children: [
                     ListTile(
@@ -505,5 +533,3 @@ class _OwnerProfileState extends State<OwnerProfile> {
         ),
       );
 }
-
-

@@ -54,7 +54,6 @@ class _StartingPageState extends State<StartingPage> {
                         onTap: ()
                         {
                           Navigator.push(context, MaterialPageRoute(builder: (context)=> const SignInCustomer()));
-
                         },
                         child: Container(
                           margin: EdgeInsets.only(left: 30,right: 30),

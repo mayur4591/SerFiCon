@@ -17,32 +17,9 @@ String idFromRoomOwnerList = '';
 class _HomeState extends State<Home> {
   late Query _ref;
   var url;
+  bool isloding=false;
 
 
-   getProfileImage(String id)  {
-     var image;
-     FirebaseDatabase.instance
-        // ignore: deprecated_member_use
-        .reference()
-        .child(
-        'Users/room_owners/$id/profile_image')
-        .once()
-        .then((value) {
-      setState(() {
-        url = value.snapshot.value;
-         if(url==null)
-           {
-             image= AssetImage('assets/images/profile_png.jpg');
-           }
-         else
-           {
-             image= NetworkImage(url);
-           }
-      });
-    });
-
-     return image;
-  }
   @override
   void initState() {
     // TODO: implement initState
@@ -50,6 +27,7 @@ class _HomeState extends State<Home> {
     super.initState();
     // ignore: deprecated_member_use
     //getProfileImage();
+    // ignore: deprecated_member_use
     _ref = FirebaseDatabase.instance.reference().child('Users/room_owners');
   }
 
@@ -60,7 +38,7 @@ class _HomeState extends State<Home> {
             child: Container(
               margin: const EdgeInsets.all(10),
               decoration: BoxDecoration(
-                  color: Colors.blueAccent.withOpacity(0.2),
+                  color: Colors.deepPurple.withOpacity(0.2),
                   border: Border.all(color: Colors.black, width: 1),
                   borderRadius: BorderRadius.circular(10)),
               child: Column(
@@ -70,17 +48,15 @@ class _HomeState extends State<Home> {
                     margin: const EdgeInsets.all(10),
                     child: ListTile(
                       title: Text(
-                          '${owners['first_name']} ${owners['last_name']}'),
-                      leading: CircleAvatar(
-                        radius: 30,
-                        backgroundImage:
-                            getProfileImage(owners['id'])
-                      ),
+                          '${owners['first_name']} ${owners['last_name']}',style: TextStyle(fontSize: 25,fontWeight: FontWeight.bold),),
                       trailing: Container(
                         margin: const EdgeInsets.only(right: 10, bottom: 2),
                         child: ElevatedButton(
                           onPressed: () {
                             print(owners.keys);
+                            setState((){
+                              isloding=true;
+                            });
                             setState(() {
                               idFromRoomOwnerList = owners['id'];
                               Navigator.push(
@@ -88,6 +64,9 @@ class _HomeState extends State<Home> {
                                   MaterialPageRoute(
                                       builder: (context) =>
                                           const OwnerProfileToVisit()));
+                            });
+                            setState((){
+                              isloding=false;
                             });
                           },
                           child: const Text('View this'),
@@ -102,7 +81,7 @@ class _HomeState extends State<Home> {
                     ),
                     title: Text(
                       owners['location'],
-                      style: const TextStyle(color: Colors.grey),
+                      style: const TextStyle(color: Colors.black),
                     ),
                   ),
                 ],
@@ -132,7 +111,15 @@ class _HomeState extends State<Home> {
           style: TextStyle(color: Colors.black),
         ),
       ),
-      body: buildHome(),
+      body: isloding==false? buildHome():Center(child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          CircularProgressIndicator(color: Colors.blueAccent,),
+          SizedBox(height: 20,),
+          Text('Loading...',style: TextStyle(color: Colors.grey,fontSize: 20),)
+
+        ],
+      )),
     );
   }
 

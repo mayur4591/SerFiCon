@@ -17,20 +17,29 @@ class _State extends State<NavigationDrawer> {
   String fname = 'loading';
   String lname = '';
   String email = '';
+  String url='';
+  var image;
   late FirebaseAuth _auth;
   String id = '';
   getData() {
     // ignore: deprecated_member_use
-    FirebaseDatabase.instance
-        .reference()
-        .child('Users/room_owners/$id')
-        .once()
-        .then((value) {
-      Map<dynamic, dynamic> map = value.snapshot.value as Map;
-      fname = map['first_name'];
-      lname = map['last_name'];
-      email = map['email'];
+
+      FirebaseDatabase.instance
+          .reference()
+          .child('Users/all_users/$id')
+          .once()
+          .then((value) {
+        setState((){
+        Map<dynamic, dynamic> map = value.snapshot.value as Map;
+        fname = map['first_name'];
+        lname = map['last_name'];
+        email = map['email'];
+        url=map['profile_image']??'';
+        image=NetworkImage(url);
+        print(url);
+      });
     });
+
   }
 
   @override
@@ -45,66 +54,76 @@ class _State extends State<NavigationDrawer> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.only(top: 88),
       width: MediaQuery.of(context).size.width / 1.4,
-      color: Colors.blueGrey,
+      color: Colors.white,
       child: ListView(children: [
-        ListTile(
-            leading: const CircleAvatar(
-              radius: 30,
-              backgroundImage: AssetImage('assets/images/profile_png.jpg'),
+        Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            SizedBox(height: 30,),
+             CircleAvatar(
+              radius: 50,
+              backgroundImage: url!=''?image:AssetImage('assets/images/profile_png.jpg')
             ),
-            title: Text(
+            const SizedBox(
+              height: 10,
+            ),
+            Text(
               '$fname $lname',
               style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
-            subtitle: Text(
+            const SizedBox(
+              height: 10,
+            ),
+            Text(
               '$email',
               style: TextStyle(color: Colors.grey, fontSize: 15),
-            )),
-        const Padding(
-          padding: EdgeInsets.only(left: 15, right: 15),
-          child: Divider(
-            thickness: 1,
-            color: Colors.white,
-          ),
-        ),
-        GestureDetector(
-            onTap: () {
-              Navigator.push(
-                  context, MaterialPageRoute(builder: (context) => Settings()));
-            },
-            child: const ListTile(
-              title: Text(
-                'Edit profile',
-                style: TextStyle(fontSize: 20),
+            ),
+            SizedBox(height: 20,),
+            const Padding(
+              padding: EdgeInsets.only(left: 15, right: 15),
+              child: Divider(
+                thickness: 1,
+                color: Colors.black,
               ),
-              leading: Icon(
-                Icons.edit,
-                color: Colors.grey,
-              ),
-            )),
-        GestureDetector(
-            onTap: () {
-              showDialog(
-                  context: context,
-                  builder: (context) => AlertDialog(
+            ),
+            GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                      context, MaterialPageRoute(builder: (context) => Settings()));
+                },
+                child: const ListTile(
+                  title: Text(
+                    'Edit profile',
+                    style: TextStyle(fontSize: 20),
+                  ),
+                  leading: Icon(
+                    Icons.edit,
+                    color: Colors.grey,
+                  ),
+                )),
+            GestureDetector(
+                onTap: () {
+                  showDialog(
+                      context: context,
+                      builder: (context) => AlertDialog(
                         title: const Text('Want to log out?'),
                         actions: [
                           GestureDetector(
                               onTap: () async {
                                 FirebaseAuth.instance.signOut();
                                 final SharedPreferences sharedPreferences =
-                                    await SharedPreferences.getInstance();
-                                print('Before removal:- ${sharedPreferences.getString('email')}');
+                                await SharedPreferences.getInstance();
+                                print(
+                                    'Before removal:- ${sharedPreferences.getString('email')}');
                                 sharedPreferences.remove('email');
-                                print('After removal:- ${sharedPreferences.getString('email')}');
+                                print(
+                                    'After removal:- ${sharedPreferences.getString('email')}');
                                 // ignore: use_build_context_synchronously
                                 Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                        builder: (context) =>
-                                            const Welcome()));
+                                        builder: (context) => const Welcome()));
                               },
                               child: const Text('Yes')),
                           GestureDetector(
@@ -114,17 +133,20 @@ class _State extends State<NavigationDrawer> {
                               child: const Text("No"))
                         ],
                       ));
-            },
-            child: const ListTile(
-              title: Text(
-                'Log out',
-                style: TextStyle(fontSize: 20),
-              ),
-              leading: Icon(
-                Icons.logout,
-                color: Colors.grey,
-              ),
-            )),
+                },
+                child: const ListTile(
+                  title: Text(
+                    'Log out',
+                    style: TextStyle(fontSize: 20),
+                  ),
+                  leading: Icon(
+                    Icons.logout,
+                    color: Colors.grey,
+                  ),
+                )),
+          ],
+        ),
+
       ]),
     );
   }
