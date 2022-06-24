@@ -18,6 +18,7 @@ class _State extends State<NavigationDrawer> {
   String lname = '';
   String email = '';
   String url='';
+  String location='';
   var image;
   late FirebaseAuth _auth;
   String id = '';
@@ -34,6 +35,7 @@ class _State extends State<NavigationDrawer> {
         fname = map['first_name'];
         lname = map['last_name'];
         email = map['email'];
+        location=map['location'];
         url=map['profile_image']??'';
         image=NetworkImage(url);
         print(url);
@@ -61,31 +63,46 @@ class _State extends State<NavigationDrawer> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             SizedBox(height: 30,),
-             CircleAvatar(
-              radius: 50,
-              backgroundImage: url!=''?image:AssetImage('assets/images/profile_png.jpg')
-            ),
-            const SizedBox(
-              height: 10,
-            ),
-            Text(
-              '$fname $lname',
-              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(
-              height: 10,
-            ),
-            Text(
-              '$email',
-              style: TextStyle(color: Colors.grey, fontSize: 15),
-            ),
-            SizedBox(height: 20,),
-            const Padding(
-              padding: EdgeInsets.only(left: 15, right: 15),
-              child: Divider(
+             Container(
+               width: MediaQuery.of(context).size.width,
+               height: 250,
+               child: Column(
+                 children: [
+                   SizedBox(height: 30,),
+                   CircleAvatar(
+                       radius: 50,
+                       backgroundImage: url!=''?image:AssetImage('assets/images/profile_png.jpg')
+                   ),
+                   const SizedBox(
+                     height: 10,
+                   ),
+                   Text(
+                     '$fname $lname',
+                     style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                   ),
+                   const SizedBox(
+                     height: 10,
+                   ),
+                   Text(
+                     '$email',
+                     style: TextStyle(color: Colors.black, fontSize: 15),
+                   ),
+                   SizedBox(height: 20,),
+                   Row(
+                     mainAxisAlignment: MainAxisAlignment.center,
+                     children: [
+                       Icon(Icons.location_on_rounded,color: Colors.red,),
+                       SizedBox(width: 5,),
+                       Text('$location',style: TextStyle(color: Colors.black),)
+                     ],
+                   )
+                 ],
+               ),
+             ),
+
+            Divider(
                 thickness: 1,
                 color: Colors.black,
-              ),
             ),
             GestureDetector(
                 onTap: () {

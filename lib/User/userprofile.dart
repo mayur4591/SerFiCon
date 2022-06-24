@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
@@ -15,11 +16,13 @@ class UserProfile extends StatefulWidget {
 class _UserProfileState extends State<UserProfile> {
   // ignore: prefer_typing_uninitialized_variables, deprecated_member_use
   final databaseRef = FirebaseDatabase.instance.reference();
+  late FirebaseAuth auth;
   var userImage;
-  late FirebaseAuth _auth;
   var fname = 'loading...';
   var lname = '';
   var uid;
+  var image;
+  bool isloding = false;
 
   // get databaseRef => null;
 
@@ -29,6 +32,12 @@ class _UserProfileState extends State<UserProfile> {
         Map<dynamic, dynamic>? map = event.snapshot.value as Map?;
         fname = map!['first_name'];
         lname = map['last_name'];
+        image = map['profile_image'] ??
+            Image(
+                image: AssetImage("assets/images/profile_png.jpg"),
+                fit: BoxFit.cover,
+                height: 145,
+                width: 145);
         print(fname);
         print(lname);
       });
@@ -46,18 +55,89 @@ class _UserProfileState extends State<UserProfile> {
 
   Future getUserImage(String name) async {
     if (name == 'Gallery') {
-      final PickedFile pickedFile = await ImagePicker()
-          // ignore: deprecated_member_use
-          .getImage(source: ImageSource.gallery) as PickedFile;
+      String? url;
+      final profile =
+          await ImagePicker().pickImage(source: ImageSource.gallery);
       setState(() {
-        userImage = File(pickedFile.path);
+        isloding = true;
+      });
+      // ignore: deprecated_member_use
+      Reference ref = FirebaseStorage.instance
+          .ref()
+          .child('all_users')
+          .child(auth.currentUser!.uid)
+          .child('profile_image');
+      await ref.putFile(File(profile!.path));
+      ref.getDownloadURL().then((value) {
+        setState(() {
+          // ignore: deprecated_member_use
+          Map<String, dynamic> map = {'profile_image': value};
+          FirebaseDatabase.instance
+              .reference()
+              .child(
+                  'Users/all_users/${FirebaseAuth.instance.currentUser!.uid}')
+              .update(map)
+              .then((value) {
+            FirebaseDatabase.instance
+                // ignore: deprecated_member_use
+                .reference()
+                .child(
+                    'Users/all_users/${FirebaseAuth.instance.currentUser!.uid}/profile_image')
+                .once()
+                .then((value) {
+              setState(() {
+                url = value.snapshot.value as String?;
+                image = url;
+              });
+            });
+          });
+          print(value);
+        });
+      });
+      setState(() {
+        isloding = false;
       });
     } else if (name == 'Camera') {
-      final PickedFile pickedFile = await ImagePicker()
-          // ignore: deprecated_member_use
-          .getImage(source: ImageSource.camera) as PickedFile;
+      String? url;
+      final profile =
+          await ImagePicker().pickImage(source: ImageSource.gallery);
       setState(() {
-        userImage = File(pickedFile.path);
+        isloding = true;
+      });
+      Reference ref = FirebaseStorage.instance
+          .ref()
+          .child('all_users')
+          .child(auth.currentUser!.uid)
+          .child('profile_image');
+      await ref.putFile(File(profile!.path));
+      ref.getDownloadURL().then((value) {
+        setState(() {
+          // ignore: deprecated_member_use
+          Map<String, dynamic> map = {'profile_image': value};
+          FirebaseDatabase.instance
+              .reference()
+              .child(
+                  'Users/all_users/${FirebaseAuth.instance.currentUser!.uid}')
+              .update(map)
+              .then((value) {
+            FirebaseDatabase.instance
+                // ignore: deprecated_member_use
+                .reference()
+                .child(
+                    'Users/all_users/${FirebaseAuth.instance.currentUser!.uid}/profile_image')
+                .once()
+                .then((value) {
+              setState(() {
+                url = value.snapshot.value as String?;
+                image = url;
+              });
+            });
+          });
+          print(value);
+        });
+      });
+      setState(() {
+        isloding = false;
       });
     }
   }
@@ -69,22 +149,26 @@ class _UserProfileState extends State<UserProfile> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    _auth = FirebaseAuth.instance;
+    auth = FirebaseAuth.instance;
     // ignore: deprecated_member_use
-    final User? user = _auth.currentUser;
+    final User? user = auth.currentUser;
     uid = user?.uid;
     fetch();
   }
 
   Image getProfile() {
-    return (userImage != null)
-        ? (Image.file(
-            userImage,
+    return (image != null)
+        ? (Image.network(
+            image,
             height: 145,
             width: 145,
             fit: BoxFit.cover,
           ))
-        : (user_profile_image);
+        : (Image(
+            image: AssetImage("assets/images/profile_png.jpg"),
+            fit: BoxFit.cover,
+            height: 145,
+            width: 145));
   }
 
   @override
@@ -100,70 +184,90 @@ class _UserProfileState extends State<UserProfile> {
           ),
         ),
         endDrawer: const UserDrawer(),
-        body: Column(children: [
-          Card(
-            child: Column(
-              children: [
-                buildUserProfileImage(),
-                const SizedBox(
-                  height: 10,
+        body: isloding == false
+            ? Column(children: [
+                Card(
+                  child: Column(
+                    children: [
+                      buildUserProfileImage(),
+                      const SizedBox(
+                        height: 10,
+                      ),
+                      Text(
+                        '$fname $lname',
+                        style:
+                            const TextStyle(color: Colors.black, fontSize: 20),
+                      ),
+                      const SizedBox(
+                        height: 15,
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          GestureDetector(
+                              onTap: () {
+                                getUserImage('Gallery');
+                              },
+                              child: const Icon(
+                                Icons.image,
+                                size: 30,
+                                color: Colors.blue,
+                              )),
+                          const SizedBox(
+                            width: 20,
+                          ),
+                          GestureDetector(
+                              onTap: () {
+                                getUserImage('Camera');
+                              },
+                              child: const Icon(
+                                Icons.camera_alt_outlined,
+                                size: 30,
+                                color: Colors.green,
+                              )),
+                        ],
+                      ),
+                      const SizedBox(
+                        height: 30,
+                      )
+                    ],
+                  ),
                 ),
-                Text(
-                  '$fname $lname',
-                  style: const TextStyle(color: Colors.black, fontSize: 20),
-                ),
-                const SizedBox(
-                  height: 15,
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    GestureDetector(
-                        onTap: () {
-                          getUserImage('Gallery');
-                        },
-                        child: const Icon(
-                          Icons.image,
-                          size: 30,
-                          color: Colors.blue,
-                        )),
-                    const SizedBox(
-                      width: 20,
-                    ),
-                    GestureDetector(
-                        onTap: () {
-                          getUserImage('Camera');
-                        },
-                        child: const Icon(
-                          Icons.camera_alt_outlined,
-                          size: 30,
-                          color: Colors.green,
-                        )),
-                  ],
-                ),
-                const SizedBox(
-                  height: 30,
-                )
-              ],
-            ),
-          ),
-          GestureDetector(
-              onTap: () {
-                Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => const BookMarks()));
-              },
-              child: const Card(
-                  child: ListTile(
-                title: Text(
-                  'Your bookmarks',
-                  style: TextStyle(fontSize: 20),
-                ),
-                trailing: Icon(
-                  Icons.bookmark,
-                  color: Colors.blueAccent,
-                ),
-              ))),
-        ]));
+                GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const BookMarks()));
+                    },
+                    child: const Card(
+                        child: ListTile(
+                      title: Text(
+                        'Your bookmarks',
+                        style: TextStyle(fontSize: 20),
+                      ),
+                      trailing: Icon(
+                        Icons.bookmark,
+                        color: Colors.blueAccent,
+                      ),
+                    ))),
+              ])
+            : Center(
+                child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  CircularProgressIndicator(
+                    color: Colors.blueAccent,
+                  ),
+                  SizedBox(
+                    height: 20,
+                  ),
+                  Text(
+                    'Uploading...',
+                    style: TextStyle(color: Colors.grey, fontSize: 20),
+                  )
+                ],
+              )));
   }
 }
 

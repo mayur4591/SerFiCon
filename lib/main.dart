@@ -6,6 +6,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:serficon/MainScreen/CustomerMenuPage.dart';
 import 'package:serficon/MainScreen/MessOwnerMenuPage.dart';
 import 'package:serficon/MainScreen/RoomOwnerMenuPage.dart';
+import 'package:serficon/Owner/ownerProfile.dart';
 import 'package:serficon/Pages/signInCustomer.dart';
 import 'package:serficon/Pages/signInOwner.dart';
 import 'package:serficon/Pages/signUpCustomer.dart';

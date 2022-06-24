@@ -1,17 +1,17 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:serficon/Pages/signUpVerifiedOwner.dart';
+import 'package:serficon/Pages/signUpCustomer.dart';
+import 'package:serficon/Pages/verifyCustomerEmail.dart';
 
-import 'emailverificationpage.dart';
 
-class SignUpOwner extends StatefulWidget {
-  const SignUpOwner({Key? key}) : super(key: key);
+class VerifyCustomer extends StatefulWidget {
+  const VerifyCustomer({Key? key}) : super(key: key);
 
   @override
-  State<SignUpOwner> createState() => _SignUpOwnerState();
+  State<VerifyCustomer> createState() => _VerifyCustomer();
 }
 
-class _SignUpOwnerState extends State<SignUpOwner> {
+class _VerifyCustomer extends State<VerifyCustomer> {
   // ignore: deprecated_member_use
 
   @override
@@ -23,9 +23,9 @@ class _SignUpOwnerState extends State<SignUpOwner> {
         stream: FirebaseAuth.instance.authStateChanges(),
         builder: (context, snapshot) {
           if (snapshot.hasData) {
-            return EmailVerificationPage();
+            return CustomerEmailVerification();
           } else {
-            return VerifiedOwner();
+            return SignUpCustomer();
           }
         },
       ),

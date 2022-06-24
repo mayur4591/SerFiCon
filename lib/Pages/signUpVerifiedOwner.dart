@@ -294,78 +294,69 @@ class _VerifiedOwnerState extends State<VerifiedOwner> {
     Navigator.pushReplacement(context, MaterialPageRoute(builder: (context )=>SignUpOwner()))
     }
     );
-    //     .then((value) => {insertOwnerInfo(data)})
-    //     .onError((error, stackTrace) => {
-    //   Flushbar(
-    //     message: '$error',
-    //     flushbarPosition: FlushbarPosition.TOP,
-    //     backgroundColor: Colors.red,
-    //     duration: Duration(seconds: 3),
-    //   ).show(context)
-    // });
 
   }
 
-  insertOwnerInfo(OwnerSignUpModal data) {
-    setState(() {
-      isloding = true;
-    });
-    dataBRef
-        .child('Users')
-        .child('all_users')
-        .child(auth.currentUser!.uid)
-        .set({
-      'first_name': data.fname,
-      'last_name': data.lname,
-      'email': data.email,
-      'location': data.location,
-      'mobile_number': data.mobileNo,
-      'role': data.role
-    }).then((value) => {
-      if (data.role == 'room_owner')
-        {
-          dataBRef
-              .child('Users')
-              .child('room_owners')
-              .child(auth.currentUser!.uid)
-              .set({
-            'first_name': data.fname,
-            'last_name': data.lname,
-            'email': data.email,
-            'location': data.location,
-            'mobile_number': data.mobileNo,
-            'role': data.role,
-            'id': auth.currentUser!.uid
-          })
-        }
-      else if (data.role == 'mess_owner')
-        {
-          dataBRef
-              .child('Users')
-              .child('mess_owners')
-              .child(auth.currentUser!.uid)
-              .set({
-            'first_name': data.fname,
-            'last_name': data.lname,
-            'email': data.email,
-            'location': data.location,
-            'mobile_number': data.mobileNo,
-            'role': data.role,
-            'id': auth.currentUser!.uid
-          })
-        }
-    });
-    Navigator.pushReplacement(
-        context, MaterialPageRoute(builder: (context) => const SignInOwner()));
-    Flushbar(
-      message: 'Account created succesfully login to get started.',
-      flushbarPosition: FlushbarPosition.TOP,
-      backgroundColor: Colors.green,
-      duration: Duration(seconds: 3),
-    ).show(context);
-
-    setState(() {
-      isloding = false;
-    });
-  }
+  // insertOwnerInfo(OwnerSignUpModal data) {
+  //   setState(() {
+  //     isloding = true;
+  //   });
+  //   dataBRef
+  //       .child('Users')
+  //       .child('all_users')
+  //       .child(auth.currentUser!.uid)
+  //       .set({
+  //     'first_name': data.fname,
+  //     'last_name': data.lname,
+  //     'email': data.email,
+  //     'location': data.location,
+  //     'mobile_number': data.mobileNo,
+  //     'role': data.role
+  //   }).then((value) => {
+  //     if (data.role == 'room_owner')
+  //       {
+  //         dataBRef
+  //             .child('Users')
+  //             .child('room_owners')
+  //             .child(auth.currentUser!.uid)
+  //             .set({
+  //           'first_name': data.fname,
+  //           'last_name': data.lname,
+  //           'email': data.email,
+  //           'location': data.location,
+  //           'mobile_number': data.mobileNo,
+  //           'role': data.role,
+  //           'id': auth.currentUser!.uid
+  //         })
+  //       }
+  //     else if (data.role == 'mess_owner')
+  //       {
+  //         dataBRef
+  //             .child('Users')
+  //             .child('mess_owners')
+  //             .child(auth.currentUser!.uid)
+  //             .set({
+  //           'first_name': data.fname,
+  //           'last_name': data.lname,
+  //           'email': data.email,
+  //           'location': data.location,
+  //           'mobile_number': data.mobileNo,
+  //           'role': data.role,
+  //           'id': auth.currentUser!.uid
+  //         })
+  //       }
+  //   });
+  //   Navigator.pushReplacement(
+  //       context, MaterialPageRoute(builder: (context) => const SignInOwner()));
+  //   Flushbar(
+  //     message: 'Account created succesfully login to get started.',
+  //     flushbarPosition: FlushbarPosition.TOP,
+  //     backgroundColor: Colors.green,
+  //     duration: Duration(seconds: 3),
+  //   ).show(context);
+  //
+  //   setState(() {
+  //     isloding = false;
+  //   });
+  // }
 }

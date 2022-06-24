@@ -19,7 +19,7 @@ class OwnerProfile extends StatefulWidget {
 }
 
 class _OwnerProfileState extends State<OwnerProfile> {
-  bool isloding=false;
+  bool isloding = false;
   var image;
   var fname = 'loading...';
   var lname = '';
@@ -71,8 +71,8 @@ class _OwnerProfileState extends State<OwnerProfile> {
 
       final profile =
           await ImagePicker().pickImage(source: ImageSource.gallery);
-      setState((){
-        isloding=true;
+      setState(() {
+        isloding = true;
       });
       // ignore: deprecated_member_use
       Reference ref = FirebaseStorage.instance
@@ -111,16 +111,16 @@ class _OwnerProfileState extends State<OwnerProfile> {
           image = url;
         });
       });
-      setState((){
-        isloding=false;
+      setState(() {
+        isloding = false;
       });
-    } else if (name == 'Camera') {
+    }
+    else if (name == 'Camera') {
       String? url;
       final profile =
           await ImagePicker().pickImage(source: ImageSource.gallery);
-
-      setState((){
-        isloding=true;
+      setState(() {
+        isloding = true;
       });
       Reference ref = FirebaseStorage.instance
           .ref()
@@ -158,8 +158,8 @@ class _OwnerProfileState extends State<OwnerProfile> {
           image = url;
         });
       });
-      setState((){
-        isloding=false;
+      setState(() {
+        isloding = false;
       });
     }
   }
@@ -180,13 +180,13 @@ class _OwnerProfileState extends State<OwnerProfile> {
     // ignore: deprecated_member_use
     final User? user = auth.currentUser;
     uid = user!.uid;
-    setState((){
-      isloding=true;
+    setState(() {
+      isloding = true;
     });
     getProfile();
     retriveData();
-    setState((){
-      isloding=false;
+    setState(() {
+      isloding = false;
     });
   }
 
@@ -201,97 +201,109 @@ class _OwnerProfileState extends State<OwnerProfile> {
           backgroundColor: Colors.deepPurple.withOpacity(0.4),
         ),
         endDrawer: const NavigationDrawer(),
-        body: isloding == false? ListView(
-          children: [
-            buildTop(),
-            buildInfo(),
-            GestureDetector(
-                onTap: () {
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => const About_Rooms()));
-                },
-                child: const Card(
-                    elevation: 1,
-                    child: ListTile(
-                      title: Text('About Rooms',
-                          style: TextStyle(color: Colors.black, fontSize: 25)),
-                      trailing: Icon(
-                        Icons.arrow_forward_ios_outlined,
-                        color: Colors.grey,
-                        size: 25,
-                      ),
-                    ))),
-            GestureDetector(
-              onTap: () {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => const About_Facilities()));
-              },
-              child: const Card(
-                  elevation: 1,
-                  child: ListTile(
-                    title: Text('Facilities',
-                        style: TextStyle(color: Colors.black, fontSize: 25)),
-                    trailing: Icon(
-                      Icons.arrow_forward_ios_outlined,
-                      color: Colors.grey,
-                      size: 25,
+        body: isloding == false
+            ? ListView(
+                children: [
+                  buildTop(),
+                  buildInfo(),
+                  GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => const About_Rooms()));
+                      },
+                      child: const Card(
+                          elevation: 1,
+                          child: ListTile(
+                            title: Text('About Rooms',
+                                style: TextStyle(
+                                    color: Colors.black, fontSize: 25)),
+                            trailing: Icon(
+                              Icons.arrow_forward_ios_outlined,
+                              color: Colors.grey,
+                              size: 25,
+                            ),
+                          ))),
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const About_Facilities()));
+                    },
+                    child: const Card(
+                        elevation: 1,
+                        child: ListTile(
+                          title: Text('Facilities',
+                              style:
+                                  TextStyle(color: Colors.black, fontSize: 25)),
+                          trailing: Icon(
+                            Icons.arrow_forward_ios_outlined,
+                            color: Colors.grey,
+                            size: 25,
+                          ),
+                        )),
+                  ),
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const Room_Photos()));
+                    },
+                    child: const Card(
+                        elevation: 1,
+                        child: ListTile(
+                          title: Text('Photos',
+                              style:
+                                  TextStyle(color: Colors.black, fontSize: 25)),
+                          trailing: Icon(
+                            Icons.arrow_forward_ios_outlined,
+                            color: Colors.grey,
+                            size: 25,
+                          ),
+                        )),
+                  ),
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const About_Rules()));
+                    },
+                    child: const Card(
+                        elevation: 1,
+                        child: ListTile(
+                          title: Text('Rules & Ristrictions',
+                              style:
+                                  TextStyle(color: Colors.black, fontSize: 25)),
+                          trailing: Icon(
+                            Icons.arrow_forward_ios_outlined,
+                            color: Colors.grey,
+                            size: 25,
+                          ),
+                        )),
+                  )
+                ],
+              )
+            : Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    CircularProgressIndicator(
+                      color: Colors.blueAccent,
                     ),
-                  )),
-            ),
-            GestureDetector(
-              onTap: () {
-
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => const Room_Photos()));
-              },
-              child: const Card(
-                  elevation: 1,
-                  child: ListTile(
-                    title: Text('Photos',
-                        style: TextStyle(color: Colors.black, fontSize: 25)),
-                    trailing: Icon(
-                      Icons.arrow_forward_ios_outlined,
-                      color: Colors.grey,
-                      size: 25,
+                    SizedBox(
+                      height: 10,
                     ),
-                  )),
-            ),
-            GestureDetector(
-              onTap: () {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => const About_Rules()));
-              },
-              child: const Card(
-                  elevation: 1,
-                  child: ListTile(
-                    title: Text('Rules & Ristrictions',
-                        style: TextStyle(color: Colors.black, fontSize: 25)),
-                    trailing: Icon(
-                      Icons.arrow_forward_ios_outlined,
-                      color: Colors.grey,
-                      size: 25,
+                    Text(
+                      'Loading...',
+                      style: TextStyle(color: Colors.grey, fontSize: 20),
                     ),
-                  )),
-            )
-          ],
-        ):Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              CircularProgressIndicator(color: Colors.blueAccent,),
-              SizedBox(height: 10,),
-              Text('Loading...',style: TextStyle(color: Colors.grey,fontSize: 20),),
-            ],
-          ),
-        ));
+                  ],
+                ),
+              ));
   }
 
   Image getProfile() {

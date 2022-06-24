@@ -62,6 +62,7 @@ class _RoomOwnerMenuPage extends State<RoomOwnerMenuPage> {
           ? CustomScrollView(
               slivers: <Widget>[
                 SliverAppBar(
+                  automaticallyImplyLeading: false,
                   title: Container(
                     margin: const EdgeInsets.only(top: 7),
                     child: Row(

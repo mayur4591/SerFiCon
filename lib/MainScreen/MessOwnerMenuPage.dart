@@ -31,6 +31,7 @@ class _MessOwnerMenuPage extends State<MessOwnerMenuPage> {
       body: CustomScrollView(
         slivers: <Widget>[
           SliverAppBar(
+            automaticallyImplyLeading: false,
             title: Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [

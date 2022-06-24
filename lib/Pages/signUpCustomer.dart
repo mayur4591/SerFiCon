@@ -4,6 +4,7 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:serficon/Modals/customerModal.dart';
 import 'package:serficon/Pages/signInCustomer.dart';
+import 'package:serficon/Pages/verifyCustomer.dart';
 
 class SignUpCustomer extends StatefulWidget {
   const SignUpCustomer({Key? key}) : super(key: key);
@@ -11,6 +12,7 @@ class SignUpCustomer extends StatefulWidget {
   @override
   State<SignUpCustomer> createState() => _SignUpCustomerState();
 }
+var customerdata;
 
 class _SignUpCustomerState extends State<SignUpCustomer> {
   // ignore: deprecated_member_use
@@ -28,7 +30,6 @@ class _SignUpCustomerState extends State<SignUpCustomer> {
   final lnameController = TextEditingController();
   final emailController = TextEditingController();
   final passwordControll = TextEditingController();
-  var data;
 
   @override
   Widget build(BuildContext context) {
@@ -149,6 +150,7 @@ class _SignUpCustomerState extends State<SignUpCustomer> {
                               duration: Duration(seconds: 3),
                             ).show(context);
                           } else {
+
                             registerUser(emailController.text.toString(),
                                 passwordControll.text.toString());
                           }
@@ -213,58 +215,50 @@ class _SignUpCustomerState extends State<SignUpCustomer> {
   }
 
   void registerUser(String email, String password) {
-    setState(() {
-      isloding = true;
+    // setState(() {
+    //   isloding = true;
+    // });
+    setState((){
+      customerdata=CustomerSignUpModal(fnameController.text.toString(), lnameController.text.toString(), email, 'customer');
     });
+
     auth
-        .createUserWithEmailAndPassword(email: email, password: password)
-        .then((value) => {
-              data = CustomerSignUpModal(fnameController.text.toString(),
-                  lnameController.text.toString(), email, 'customer'),
-              insertDate(data),
-            })
-        .onError((error, stackTrace) => {
-              Flushbar(
-                message: '$error.',
-                flushbarPosition: FlushbarPosition.TOP,
-                backgroundColor: Colors.red,
-                duration: Duration(seconds: 3),
-              ).show(context)
-            });
-    setState(() {
-      isloding = false;
+        .createUserWithEmailAndPassword(email: email, password: password).then((value) => {
+    Navigator.pushReplacement(context,MaterialPageRoute(builder: (context)=>VerifyCustomer()))
+
     });
+
   }
 
-  insertDate(CustomerSignUpModal data) {
-    setState(() {
-      isloding = true;
-    });
-    dbRef.child('Users').child('all_users').child(auth.currentUser!.uid).set({
-      'first_name': data.fname,
-      'last_name': data.lname,
-      'email': data.email,
-      'role': data.role
-    }).onError((error, stackTrace) => {
-          ScaffoldMessenger.of(context)
-              .showSnackBar(SnackBar(content: Text('$error'))),
-          setState(() {
-            isloding = false;
-          }),
-          print(error)
-        });
-    isloding
-        ? Flushbar(
-        message:'Account created succesfully login to get started.' ,
-        flushbarPosition: FlushbarPosition.TOP,
-        backgroundColor: Colors.green,
-        duration: Duration(seconds: 3),
-    ).show(context)        : print('error');
-    Navigator.pushReplacement(context,
-        MaterialPageRoute(builder: (context) => const SignInCustomer()));
-
-    setState(() {
-      isloding = false;
-    });
-  }
+  // insertDate(CustomerSignUpModal data) {
+  //   setState(() {
+  //     isloding = true;
+  //   });
+  //   dbRef.child('Users').child('all_users').child(auth.currentUser!.uid).set({
+  //     'first_name': data.fname,
+  //     'last_name': data.lname,
+  //     'email': data.email,
+  //     'role': data.role
+  //   }).onError((error, stackTrace) => {
+  //         ScaffoldMessenger.of(context)
+  //             .showSnackBar(SnackBar(content: Text('$error'))),
+  //         setState(() {
+  //           isloding = false;
+  //         }),
+  //         print(error)
+  //       });
+  //   isloding
+  //       ? Flushbar(
+  //       message:'Account created succesfully login to get started.' ,
+  //       flushbarPosition: FlushbarPosition.TOP,
+  //       backgroundColor: Colors.green,
+  //       duration: Duration(seconds: 3),
+  //   ).show(context)        : print('error');
+  //   Navigator.pushReplacement(context,
+  //       MaterialPageRoute(builder: (context) => const SignInCustomer()));
+  //
+  //   setState(() {
+  //     isloding = false;
+  //   });
+  // }
 }

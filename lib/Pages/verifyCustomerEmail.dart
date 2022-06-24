@@ -1,20 +1,22 @@
 import 'dart:async';
+
 import 'package:another_flushbar/flushbar.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
-import 'package:serficon/Pages/signInOwner.dart';
-import 'package:serficon/Pages/signUpVerifiedOwner.dart';
-import '../Modals/ownerModal.dart';
+import 'package:serficon/Pages/signInCustomer.dart';
+import 'package:serficon/Pages/signUpCustomer.dart';
 
-class EmailVerificationPage extends StatefulWidget {
-  const EmailVerificationPage({Key? key}) : super(key: key);
+import '../Modals/customerModal.dart';
+
+class CustomerEmailVerification extends StatefulWidget {
+  const CustomerEmailVerification({Key? key}) : super(key: key);
 
   @override
-  State<EmailVerificationPage> createState() => _State();
+  State<CustomerEmailVerification> createState() => _CustomerEmailVerificationState();
 }
 
-class _State extends State<EmailVerificationPage> {
+class _CustomerEmailVerificationState extends State<CustomerEmailVerification> {
   bool isEmailVerified = false;
   Timer? timer;
   // ignore: deprecated_member_use
@@ -105,7 +107,7 @@ class _State extends State<EmailVerificationPage> {
                 Padding(
                     padding: EdgeInsets.only(left: 20, right: 20),
                     child: Text(
-                        'Check  your inbox/spam folder and click on link given to verify your email..',
+                        'Check  your mail inbox/spam folder and click on link  to verify your email..',
                         style: TextStyle(color: Colors.grey, fontSize: 20))),
                 SizedBox(
                   height: 20,
@@ -156,57 +158,28 @@ class _State extends State<EmailVerificationPage> {
         );
 
   returnWidget() {
-    insertOwnerInfo(data);
-    return SignInOwner();
+    insertDate(customerdata);
+    return SignInCustomer();
   }
 
-  insertOwnerInfo(OwnerSignUpModal data) {
+  insertDate(CustomerSignUpModal data) {
     dataBRef
         .child('Users')
         .child('all_users')
-        .child(FirebaseAuth.instance.currentUser!.uid)
+        .child(auth.currentUser!.uid)
         .set({
       'first_name': data.fname,
       'last_name': data.lname,
       'email': data.email,
-      'location': data.location,
-      'mobile_number': data.mobileNo,
       'role': data.role
-    }).then((value) => {
-              if (data.role == 'room_owner')
-                {
-                  dataBRef
-                      .child('Users')
-                      .child('room_owners')
-                      .child(auth.currentUser!.uid)
-                      .set({
-                    'first_name': data.fname,
-                    'last_name': data.lname,
-                    'email': data.email,
-                    'location': data.location,
-                    'mobile_number': data.mobileNo,
-                    'role': data.role,
-                    'id': auth.currentUser!.uid
-                  })
-                }
-              else if (data.role == 'mess_owner')
-                {
-                  dataBRef
-                      .child('Users')
-                      .child('mess_owners')
-                      .child(auth.currentUser!.uid)
-                      .set({
-                    'first_name': data.fname,
-                    'last_name': data.lname,
-                    'email': data.email,
-                    'location': data.location,
-                    'mobile_number': data.mobileNo,
-                    'role': data.role,
-                    'id': auth.currentUser!.uid
-                  })
-                }
-            });
-
-
+    }).onError((error, stackTrace) {
+      Flushbar(
+              message: 'Something went wrong try again...',
+              duration: Duration(seconds: 3),
+              backgroundColor: Colors.red,
+              flushbarPosition: FlushbarPosition.TOP)
+          .show(context);
+      print(error);
+    });
   }
 }
