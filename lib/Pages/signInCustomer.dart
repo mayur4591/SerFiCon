@@ -1,9 +1,13 @@
+import 'dart:async';
+
 import 'package:another_flushbar/flushbar.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
+import 'package:internet_connection_checker/internet_connection_checker.dart';
 import 'package:lottie/lottie.dart';
 import 'package:serficon/MainScreen/CustomerMenuPage.dart';
+import 'package:serficon/Pages/forgetPasswordPage.dart';
 import 'package:serficon/Pages/signUpCustomer.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -18,26 +22,48 @@ class SignInCustomer extends StatefulWidget {
 }
 
 class _SignInCustomerState extends State<SignInCustomer> {
+  late StreamSubscription<InternetConnectionStatus> listener;
+
   // ignore: deprecated_member_use
   bool loading=false;
   DatabaseReference databaseReference = FirebaseDatabase.instance.reference();
   late final FirebaseAuth auth;
+  bool hasConnection=true;
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
+
+    listener = InternetConnectionChecker()
+        .onStatusChange
+        .listen((InternetConnectionStatus status) {
+      switch (status) {
+        case InternetConnectionStatus.connected:
+          setState(() {
+            hasConnection = true;
+          });
+          break;
+        case InternetConnectionStatus.disconnected:
+          setState(() {
+            hasConnection = false;
+          });
+          // TODO: Handle this case.
+          break;
+      }
+    });
     auth = FirebaseAuth.instance;
   }
+
 
   final emailController = TextEditingController();
   final passwordControll = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return hasConnection?Scaffold(
       resizeToAvoidBottomInset: false,
       body: loading==false ? Container(
-          color: Colors.orangeAccent.withOpacity(0.7),
+          color: Colors.teal.withOpacity(0.3),
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 30),
             child: ListView(
@@ -119,12 +145,28 @@ class _SignInCustomerState extends State<SignInCustomer> {
                           duration: Duration(seconds: 3),
                         ).show(context);
 
-                      } else {
+                      }
+                      else {
                         setState((){
                           loading=true;
+
+                          Future.delayed(const Duration(seconds: 10),(){
+                            if(loading==true)
+                              {
+                                Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>SignInCustomer()));
+                                setState((){
+                                  loading=false;
+                                });
+                              Flushbar(
+                              message: 'Please try to sign in again..',
+                              flushbarPosition: FlushbarPosition.TOP,
+                              backgroundColor: Colors.red,
+                              duration: Duration(seconds: 3),
+                              ).show(context);
+
+                              }
+                          });
                         });
-                        // doSignInCustomer(
-                        //     emailController.text, passwordControll.text);
                         await auth.signInWithEmailAndPassword(email: emailController.text, password: passwordControll.text).whenComplete(() => {
                           setState((){
                           loading=false;
@@ -140,16 +182,11 @@ class _SignInCustomerState extends State<SignInCustomer> {
                           var role=value.snapshot.value;
                           if(role=='room_owner')
                           {
-
                             Navigator.pushReplacement(context,MaterialPageRoute(builder: (context)=> const RoomOwnerMenuPage()));
-
-
                           }
                           else if(role=='mess_owner')
                           {
-
                             Navigator.pushReplacement(context,MaterialPageRoute(builder: (context)=> const MessOwnerMenuPage()));
-
 
                           }
                           else if(role=='customer')
@@ -157,13 +194,19 @@ class _SignInCustomerState extends State<SignInCustomer> {
 
                             Navigator.pushReplacement(context,MaterialPageRoute(builder: (context)=> const MenuPage()));
 
-
                           }
-                        });
-                        setState((){
-                          loading=false;
-                        });
+                        }).onError((error, stackTrace)  {
+                           Flushbar(
+                             message: '$error',
+                             flushbarPosition: FlushbarPosition.TOP,
+                             backgroundColor: Colors.red,
+                             duration: Duration(seconds: 3),
+                           ).show(context);
+                         });
                       }
+                      setState((){
+                        loading=false;
+                      });
                     },
                     child:Container(
                       height: 40,
@@ -184,7 +227,21 @@ class _SignInCustomerState extends State<SignInCustomer> {
                     )
                 ),
                 const SizedBox(
-                  height: 40,
+                  height: 20,
+                ),
+                GestureDetector(
+                  onTap: (){
+                    Navigator.push(context, MaterialPageRoute(builder: (context)=>ForgetPassword() ));
+                  },
+                  child: Center(
+                    child: const Text(
+                      "Forget Password?",
+                      style: TextStyle(fontSize: 20, color: Colors.blueAccent),
+                    ),
+                  ),
+                ),
+                const SizedBox(
+                  height: 20,
                 ),
                 Center(
                   child: const Text(
@@ -213,7 +270,8 @@ class _SignInCustomerState extends State<SignInCustomer> {
               ],
             ),
           ),
-        ):Center(child: Column(
+        )
+          :Center(child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
           children: [
             CircularProgressIndicator(color: Colors.blueAccent,),
@@ -223,7 +281,30 @@ class _SignInCustomerState extends State<SignInCustomer> {
           ],
         )),
 
-    );
+    ):MaterialApp(
+      color: Colors.white,
+      debugShowCheckedModeBanner: false,
+      home: Scaffold(
+        body: Container(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Container(
+                    margin: EdgeInsets.only(top: 80),
+                    child: Center(
+                      child: Text(
+                        'Check your connectivity..!',
+                        style: TextStyle(color: Colors.black, fontSize: 24),
+                      ),
+                    )),
+                SizedBox(
+                  height: 10,
+                ),
+                Lottie.asset('assets/lottie/connectionerror.json')
+              ],
+            )),
+      ),
+    );;
   }
 
 

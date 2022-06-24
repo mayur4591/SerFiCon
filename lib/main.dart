@@ -1,16 +1,25 @@
 import 'dart:async';
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:internet_connection_checker/internet_connection_checker.dart';
+import 'package:lottie/lottie.dart';
+import 'package:serficon/Bottom_nav/mess_owner_list.dart';
+import 'package:serficon/Bottom_nav/roomOwnerList.dart';
 import 'package:serficon/MainScreen/CustomerMenuPage.dart';
 import 'package:serficon/MainScreen/MessOwnerMenuPage.dart';
 import 'package:serficon/MainScreen/RoomOwnerMenuPage.dart';
+import 'package:serficon/MessOwnerProfile/MessOwnerProfile.dart';
+import 'package:serficon/Owner/Drawer.dart';
+import 'package:serficon/Owner/ownerProfile.dart';
 import 'package:serficon/Pages/signInCustomer.dart';
 import 'package:serficon/Pages/signInOwner.dart';
 import 'package:serficon/Pages/signUpCustomer.dart';
 import 'package:serficon/Pages/signUpOwner.dart';
 import 'package:serficon/Pages/welcomeScreen.dart';
+import 'package:serficon/User/userprofile.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'Pages/emailverificationpage.dart';
@@ -28,51 +37,46 @@ class MyApp extends StatefulWidget {
   @override
   State<MyApp> createState() => _MyAppState();
 }
-
+bool isloding=false;
 class _MyAppState extends State<MyApp> {
   // ignore: deprecated_member_use
+  late StreamSubscription<InternetConnectionStatus> listener;
   late final FirebaseAuth auth;
   var role;
-  late Map<dynamic, dynamic> map;
-  String string = 'hello';
   var page;
   // ignore: deprecated_member_use
   final DatabaseReference databaseReference =
       FirebaseDatabase.instance.reference();
-
+  bool hasConnection = false;
+  Connectivity connectivity = Connectivity();
   @override
   void initState() {
     // TODO: implement initState
-    map = {
-      'room_owner': const RoomOwnerMenuPage(),
-      'mess_owner': const MessOwnerMenuPage(),
-      'customer': const MenuPage()
-    };
+    listener = InternetConnectionChecker()
+        .onStatusChange
+        .listen((InternetConnectionStatus status) {
+      switch (status) {
+        case InternetConnectionStatus.connected:
+          setState(() {
+            hasConnection = true;
+          });
+          break;
+        case InternetConnectionStatus.disconnected:
+          setState(() {
+            hasConnection = false;
+          });
+          // TODO: Handle this case.
+          break;
+      }
+    });
+
     auth = FirebaseAuth.instance;
-    if (auth.currentUser != null) {
-      setState(() {
-        getRole();
-      });
-    }
     super.initState();
+    //checkConnection();
     getLoginStatus();
   }
 
-  getRole() {
-    databaseReference
-        .child('Users')
-        .child('all_users')
-        .child(auth.currentUser!.uid)
-        .child('role')
-        .once()
-        .then((value) {
-      role = value.snapshot.value;
-      print('In in it state :-$role');
-      if (role == null) {
-        print('role is null');
-      }
-    });
-  }
+
 
   Future getLoginStatus() async {
     final SharedPreferences sharedPreferences =
@@ -90,12 +94,149 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
-    setState(() {
-      page = map[role];
+    return hasConnection
+        ? isloding==false? MaterialApp(debugShowCheckedModeBanner: false, home: FirebaseAuth.instance.currentUser==null?Welcome():HomePage()):
+    Center(child: Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        CircularProgressIndicator(color: Colors.blueAccent,),
+        SizedBox(height: 20,),
+        Text('Loading...',style: TextStyle(color: Colors.grey,fontSize: 20),)
+
+      ],
+    )): MaterialApp(
+            color: Colors.white,
+            debugShowCheckedModeBanner: false,
+            home: Scaffold(
+              body: Container(
+                  child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Container(
+                      margin: EdgeInsets.only(top: 80),
+                      child: Center(
+                        child: Text(
+                          'Check your connectivity..!',
+                          style: TextStyle(color: Colors.black, fontSize: 24),
+                        ),
+                      )),
+                  SizedBox(
+                    height: 10,
+                  ),
+                  Lottie.asset('assets/lottie/connectionerror.json')
+                ],
+              )),
+            ),
+          );
+    ;
+  }
+
+}
+class HomePage extends StatefulWidget {
+  const HomePage({Key? key}) : super(key: key);
+
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  String role='';
+   var page;
+  getRole() {
+    setState((){
+      isloding=true;
     });
+    FirebaseDatabase.instance.reference()
+        .child('Users')
+        .child('all_users')
+        .child(FirebaseAuth.instance.currentUser!.uid)
+        .child('role')
+        .once()
+        .then((value) {
+      setState(() {
+        role = value.snapshot.value as String;
+      });
+
+      print('In in it state :-$role');
+      if (role == null) {
+        print('role is null');
+      }
+    });
+    setState((){
+      isloding=false;
+    });
+  }
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    setState((){
+      isloding=true;
+    });
+    getRole();
+    print(role);
+    setState((){
+      isloding=false;
+    });
+
+  //checkScreen();
+  }
+  @override
+  Widget build(BuildContext context) {
     return MaterialApp(
-        debugShowCheckedModeBanner: false,
-        home:  Welcome()
+      debugShowCheckedModeBanner: false,
+      home: role=='mess_owner'?MessOwnerMenuPage():role=='room_owner'?RoomOwnerMenuPage():role=='customer'?MenuPage():Scaffold(
+        body: Center(child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            CircularProgressIndicator(color: Colors.blueAccent,),
+            SizedBox(height: 20,),
+            Text('Loading...',style: TextStyle(color: Colors.grey,fontSize: 20),)
+
+          ],
+        )),
+      ),
     );
   }
+  // void checkScreen() {
+  //   print('in check screen');
+  //   switch(role)
+  //   {
+  //     case 'customer':setState((){
+  //       page=MenuPage();
+  //     });
+  //     break;
+  //
+  //     case 'room_owner': setState((){
+  //       page=RoomOwnerMenuPage();
+  //     });
+  //     break;
+  //
+  //     case 'mess_owner': print('hello mayur');
+  //     setState((){
+  //       page=MessOwnerMenuPage();
+  //     });
+  //     break;
+  //   }
+  //   // if(role=='customer')
+  //   // {
+  //   //   setState((){
+  //   //     page=MenuPage();
+  //   //   });
+  //   // }
+  //   // else if(role=='room_owner')
+  //   // {
+  //   //   setState((){
+  //   //     page=RoomOwnerMenuPage();
+  //   //   });
+  //   // }
+  //   // else if(role=='mess_owner')
+  //   // {
+  //   //   print('hello mayur');
+  //   //   setState((){
+  //   //     page=MessOwnerMenuPage();
+  //   //   });
+  //   // }
+  // }
 }
+

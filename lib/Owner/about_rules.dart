@@ -5,6 +5,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_database/ui/firebase_animated_list.dart';
 import 'package:flutter/material.dart';
+import 'package:lottie/lottie.dart';
 
 import '../Modal Classes/ristrictions_model.dart';
 
@@ -28,10 +29,27 @@ class _About_RulesState extends State<About_Rules> {
     ruleController.dispose();
     super.dispose();
   }
+  bool list = true;
+  check() {
+    FirebaseDatabase.instance
+        .reference()
+        .child(
+        'Users/all_users/${FirebaseAuth.instance.currentUser!.uid}/ristrictions')
+        .once()
+        .then((value) => {
+      if (value.snapshot.value == null)
+        {
+          setState(() {
+            list = false;
+          })
+        }
+    });
+  }
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
+    check();
     _ref = FirebaseDatabase.instance.reference().child('Users/all_users/${FirebaseAuth.instance.currentUser!.uid}/ristrictions');
 
   }
@@ -164,7 +182,21 @@ class _About_RulesState extends State<About_Rules> {
             openDialoge();
           },
         ),
-        body: isloding==false?buildHome():Center(child: Column(mainAxisAlignment: MainAxisAlignment.center,children: [
+        body: isloding==false? list?buildHome():Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Lottie.asset('assets/lottie/empty.json'),
+            Container(
+              margin: EdgeInsets.only(left: 25, right: 25),
+              child: Center(
+                  child: Text(
+                    'You have not uploaded anything..!',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(color: Colors.grey, fontSize: 25),
+                  )),
+            )
+          ],
+        ):Center(child: Column(mainAxisAlignment: MainAxisAlignment.center,children: [
           CircularProgressIndicator(color: Colors.blueAccent,),
           SizedBox(height: 20,),
           Text('Uploading...',style: TextStyle(color: Colors.grey,fontSize: 20),)

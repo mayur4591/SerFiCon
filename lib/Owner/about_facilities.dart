@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_database/ui/firebase_animated_list.dart';
 import 'package:flutter/material.dart';
+import 'package:lottie/lottie.dart';
 import 'dart:math';
 import '../Modal Classes/ristrictions_model.dart';
 
@@ -27,11 +28,29 @@ class _About_FacilitiesState extends State<About_Facilities> {
     facilityController.dispose();
     super.dispose();
   }
+
+  bool list = true;
+  check() {
+    FirebaseDatabase.instance
+        .reference()
+        .child(
+        'Users/all_users/${FirebaseAuth.instance.currentUser!.uid}/facilities')
+        .once()
+        .then((value) => {
+      if (value.snapshot.value == null)
+        {
+          setState(() {
+            list = false;
+          })
+        }
+    });
+  }
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
     // ignore: deprecated_member_use
+    check();
     _ref = FirebaseDatabase.instance.reference().child('Users/all_users/${FirebaseAuth.instance.currentUser!.uid}/facilities');
   }
 
@@ -156,7 +175,21 @@ class _About_FacilitiesState extends State<About_Facilities> {
             openDialoge();
           },
         ),
-        body: loading==false?buildHome():Center(child: Column(mainAxisAlignment: MainAxisAlignment.center,children: [
+        body: loading==false? list?buildHome():Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Lottie.asset('assets/lottie/empty.json'),
+            Container(
+              margin: EdgeInsets.only(left: 25, right: 25),
+              child: Center(
+                  child: Text(
+                    'You have not uploaded anything..!',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(color: Colors.grey, fontSize: 25),
+                  )),
+            )
+          ],
+        ):Center(child: Column(mainAxisAlignment: MainAxisAlignment.center,children: [
           CircularProgressIndicator(color: Colors.blueAccent,),
           SizedBox(height: 20,),
           Text('Uploading...',style: TextStyle(color: Colors.grey,fontSize: 20),)

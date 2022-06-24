@@ -56,6 +56,7 @@ class _RoomsState extends State<Rooms> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
+          backgroundColor: Colors.cyan,
           elevation: 0,
           automaticallyImplyLeading: false,
           title: const Text(
@@ -77,7 +78,8 @@ class _RoomsState extends State<Rooms> {
                 style: const TextStyle(fontSize: 15, color: Colors.grey),
               ),
               collapsed: const Text(''),
-            ))),
+            )
+                )),
             Card(
                 child: ListTile(
                     title: ExpandablePanel(

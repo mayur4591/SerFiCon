@@ -1,20 +1,20 @@
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
-import 'package:serficon/Pages/StartingPage.dart';
-import 'package:serficon/Pages/signInOwner.dart';
-import 'package:serficon/Pages/welcomeScreen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'Settings.dart';
 
-class NavigationDrawer extends StatefulWidget {
-  const NavigationDrawer({Key? key}) : super(key: key);
+import '../Pages/StartingPage.dart';
+import '../Pages/welcomeScreen.dart';
+
+class MessOwnerDrawer extends StatefulWidget {
+  const MessOwnerDrawer({Key? key}) : super(key: key);
 
   @override
-  State<NavigationDrawer> createState() => _State();
+  State<MessOwnerDrawer> createState() => _MessOwnerDrawerState();
 }
 
-class _State extends State<NavigationDrawer> {
+class _MessOwnerDrawerState extends State<MessOwnerDrawer> {
   String fname = 'loading';
   String lname = '';
   String email = '';
@@ -22,16 +22,14 @@ class _State extends State<NavigationDrawer> {
   String city='';
   var roomname='';
   var image;
-  late FirebaseAuth _auth;
-  String id = '';
-  getData() {
+  getMessData() {
     // ignore: deprecated_member_use
-      FirebaseDatabase.instance
-          .reference()
-          .child('Users/all_users/$id')
-          .once()
-          .then((value) {
-        setState((){
+    FirebaseDatabase.instance
+        .reference()
+        .child('Users/all_users/${FirebaseAuth.instance.currentUser!.uid}')
+        .once()
+        .then((value) {
+      setState((){
         Map<dynamic, dynamic> map = value.snapshot.value as Map;
         fname = map['first_name'];
         lname = map['last_name'];
@@ -39,22 +37,18 @@ class _State extends State<NavigationDrawer> {
         roomname=map['name'];
         city=map['city'];
         url=map['profile_image']??'';
-        image=NetworkImage(url);
-        print(url);
+         image=NetworkImage(url);
+        // print(url);
       });
     });
 
   }
-
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    _auth = FirebaseAuth.instance;
-    id = _auth.currentUser!.uid;
-    getData();
+    getMessData();
   }
-
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -64,49 +58,49 @@ class _State extends State<NavigationDrawer> {
         Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            //SizedBox(height: 30,),
-             Container(
-               color: Colors.deepPurple.withOpacity(0.7),
-               width: MediaQuery.of(context).size.width,
-               height: 270,
-               child: Column(
-                 children: [
-                   SizedBox(height: 30,),
-                   CircleAvatar(
-                       radius: 50,
-                       backgroundImage: url!=''?image:AssetImage('assets/images/profile_png.jpg')
-                   ),
-                   const SizedBox(
-                     height: 10,
-                   ),
-                   Text(
-                     '$fname $lname',
-                     style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                   ),
-                   const SizedBox(
-                     height: 10,
-                   ),
-                   // Text('$roomname',style: TextStyle(color: Colors.black,fontSize: 15),),
-                   // const SizedBox(
-                   //   height: 10,
-                   // ),
-                   Text(
-                     '$email',
-                     style: TextStyle(color: Colors.black, fontSize: 15),
-                   ),
-                   SizedBox(height: 20,),
-                   Row(
-                     mainAxisAlignment: MainAxisAlignment.center,
-                     children: [
-                       Icon(Icons.location_on_rounded,color: Colors.red,),
-                       SizedBox(width: 5,),
-                       Text('$city',style: TextStyle(color: Colors.black),)
-                     ],
-                   ),
-                   SizedBox(height: 5,),
-                 ],
-               ),
-             ),
+            Container(
+              color: Colors.green.withOpacity(0.7),
+              width: MediaQuery.of(context).size.width,
+              height: 270,
+              child: Column(
+                children: [
+                  SizedBox(height: 30,),
+                  CircleAvatar(
+                      radius: 50,
+                      backgroundImage: url!=''?image:AssetImage('assets/images/profile_png.jpg')
+                  ),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  Text(
+                    '$fname $lname',
+                    style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                 // Text('$roomname',style: TextStyle(color: Colors.grey,fontSize: 15),),
+                 //  const SizedBox(
+                 //    height: 10,
+                 //  ),
+                  Text(
+                    '$email',
+                    style: TextStyle(color: Colors.black, fontSize: 15),
+                  ),
+                  SizedBox(height: 20,),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.location_on_rounded,color: Colors.blueAccent,),
+                      SizedBox(width: 5,),
+                      Text('$city',style: TextStyle(color: Colors.black),)
+                    ],
+                  ),
+                  SizedBox(height: 5,),
+                ],
+              ),
+            ),
+
             GestureDetector(
                 onTap: () {
                   showDialog(
@@ -126,7 +120,7 @@ class _State extends State<NavigationDrawer> {
                                     'After removal:- ${sharedPreferences.getString('email')}');
                                 // ignore: use_build_context_synchronously
                                 Navigator.popUntil(context, (route) => route==StartingPage);
-                                Navigator.push(context,MaterialPageRoute(builder: (context)=>StartingPage()));
+                                Navigator.push(context,MaterialPageRoute(builder: (context)=>StartingPage()));;
                               },
                               child: const Text('Yes ',style: TextStyle(color: Colors.black,fontSize: 20),)),
                           GestureDetector(

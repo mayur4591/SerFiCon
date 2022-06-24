@@ -12,16 +12,49 @@ class MessOwnerMenuPage extends StatefulWidget {
   const MessOwnerMenuPage({Key? key}) : super(key: key);
   static String id = 'MenuPage';
   @override
-  State<MessOwnerMenuPage> createState() =>_MessOwnerMenuPage();
+  State<MessOwnerMenuPage> createState() => _MessOwnerMenuPage();
 }
 
 class _MessOwnerMenuPage extends State<MessOwnerMenuPage> {
   var role;
+  var image;
+  final Image owner_profile_image = const Image(
+      image: AssetImage("assets/images/profile_png.jpg"),
+      fit: BoxFit.cover,
+      height: 145,
+      width: 145);
+
+  Future<void> retriveData() async {
+    //print(uid);
+    print("Hey your id is ${FirebaseAuth.instance.currentUser!.uid}");
+    await FirebaseDatabase.instance
+        .reference()
+        .child('Users/all_users/${FirebaseAuth.instance.currentUser!.uid}')
+        .once()
+        .then((value) {
+      setState(() {
+        if (value.snapshot != null) {
+          Map<dynamic, dynamic>? map = value.snapshot.value as Map?;
+          image = map!['profile_image'];
+        } else {
+          print(value.snapshot.value);
+        }
+      });
+    });
+  }
+
+  get() {
+    return image == null
+        ? const AssetImage('assets/images/profile_png.jpg')
+        : NetworkImage(image);
+  }
+
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
     // ignore: deprecated_member_use
+    retriveData();
     findRole();
   }
 
@@ -31,6 +64,7 @@ class _MessOwnerMenuPage extends State<MessOwnerMenuPage> {
       body: CustomScrollView(
         slivers: <Widget>[
           SliverAppBar(
+            automaticallyImplyLeading: false,
             title: Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
@@ -38,11 +72,7 @@ class _MessOwnerMenuPage extends State<MessOwnerMenuPage> {
                   onTap: () {
                     goToProfile();
                   },
-                  child: const CircleAvatar(
-                    radius: 30,
-                    backgroundImage:
-                    AssetImage('assets/images/profile_png.jpg'),
-                  ),
+                  child: CircleAvatar(radius: 25, backgroundImage: get()),
                 ),
               ],
             ),
@@ -170,7 +200,6 @@ class _MessOwnerMenuPage extends State<MessOwnerMenuPage> {
   void goToProfile() {
     Navigator.push(context,
         MaterialPageRoute(builder: (context) => const MessOwnerProfile()));
-
   }
 
   void findRole() {

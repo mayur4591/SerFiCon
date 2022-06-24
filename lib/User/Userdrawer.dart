@@ -1,11 +1,11 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
-import 'package:serficon/Pages/signInOwner.dart';
 import 'package:serficon/Pages/welcomeScreen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import 'Edit_profile_user.dart';
+import '../Pages/StartingPage.dart';
+
 
 class UserDrawer extends StatefulWidget {
   const UserDrawer({Key? key}) : super(key: key);
@@ -74,25 +74,10 @@ class _UserDrawerState extends State<UserDrawer> {
           ),
           GestureDetector(
               onTap: () {
-                Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => EditProfile()));
-              },
-              child: const ListTile(
-                title: Text(
-                  'Edit profile',
-                  style: TextStyle(fontSize: 20),
-                ),
-                leading: Icon(
-                  Icons.edit,
-                  color: Colors.grey,
-                ),
-              )),
-          GestureDetector(
-              onTap: () {
                 showDialog(
                     context: context,
                     builder: (context) => AlertDialog(
-                          title: const Text('Want to log out?'),
+                          title: const Text('Want to log out?',style: TextStyle(fontSize: 20)),
                           actions: [
                             GestureDetector(
                                 onTap: () async {
@@ -102,17 +87,15 @@ class _UserDrawerState extends State<UserDrawer> {
                                   sharedPreferences.remove('email');
                                   print('After removal:- ${sharedPreferences.getString('email')}');
                                   // ignore: use_build_context_synchronously
-                                  Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) => const Welcome()));
+                                  Navigator.popUntil(context, (route) => route==StartingPage);
+                                  Navigator.push(context,MaterialPageRoute(builder: (context)=>StartingPage()));
                                 },
-                                child: const Text('Yes')),
+                                child: const Text('Yes ',style: TextStyle(fontSize: 18),)),
                             GestureDetector(
                                 onTap: () {
                                   Navigator.pop(context, false);
                                 },
-                                child: const Text("No"))
+                                child: const Text(" No",style: TextStyle(fontSize: 18)))
                           ],
                         ));
               },

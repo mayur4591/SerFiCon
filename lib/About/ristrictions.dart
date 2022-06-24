@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_database/ui/firebase_animated_list.dart';
 import 'package:flutter/material.dart';
+import 'package:lottie/lottie.dart';
 
 import '../Bottom_nav/roomOwnerList.dart';
 import '../Modal Classes/ristrictions_model.dart';
@@ -25,11 +26,29 @@ class _RistrictionsState extends State<Ristrictions> {
   var title = 'Not given by owner yet';
   var rule = 'Not given by owner yet';
 
+  bool list = true;
+  check() {
+    FirebaseDatabase.instance
+        .reference()
+        .child(
+        'Users/all_users/${FirebaseAuth.instance.currentUser!.uid}/ristrictions')
+        .once()
+        .then((value) => {
+      if (value.snapshot.value == null)
+        {
+          setState(() {
+            list = false;
+          })
+        }
+    });
+  }
+
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
     // ignore: deprecated_member_use
+    check();
     _ref = FirebaseDatabase.instance
         .reference()
         .child('Users/room_owners/$idFromRoomOwnerList/ristrictions');
@@ -71,7 +90,22 @@ class _RistrictionsState extends State<Ristrictions> {
           ),
           backgroundColor: Colors.lightGreen.withOpacity(0.5),
         ),
-        body: buildHome());
+        body: list?buildHome() :Column(
+    mainAxisAlignment: MainAxisAlignment.center,
+    children: [
+    Lottie.asset('assets/lottie/empty.json'),
+    Container(
+    margin: EdgeInsets.only(left: 25, right: 25),
+    child: Center(
+    child: Text(
+    'Not uploaded yet ..!',
+    textAlign: TextAlign.center,
+    style: TextStyle(color: Colors.grey, fontSize: 25),
+    )),
+    )
+    ],
+    )
+    );
   }
 
   Widget buildHome() {

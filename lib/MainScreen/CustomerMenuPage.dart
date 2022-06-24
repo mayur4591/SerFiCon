@@ -33,6 +33,7 @@ class _MenuPageState extends State<MenuPage> {
       body: isloding==false?CustomScrollView(
         slivers: <Widget>[
           SliverAppBar(
+            automaticallyImplyLeading: false,
             title: Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [

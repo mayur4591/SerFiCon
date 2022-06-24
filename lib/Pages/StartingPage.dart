@@ -16,7 +16,7 @@ class _StartingPageState extends State<StartingPage> {
     return Scaffold(
       body:  Center(
         child: Container(
-          color: Colors.blueAccent.withOpacity(0.3),
+          color: Colors.blueAccent.withOpacity(0.4),
           child: Center(
             child: ListView(
                 children: [
@@ -35,7 +35,7 @@ class _StartingPageState extends State<StartingPage> {
                       GestureDetector(
                         onTap: ()
                         {
-                          Navigator.push(context, MaterialPageRoute(builder: (context)=> const SignInOwner()));
+                          Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=> const SignInOwner()));
                         },
                         child: Container(
                           width: MediaQuery.of(context).size.width/1.5,
@@ -53,7 +53,7 @@ class _StartingPageState extends State<StartingPage> {
                       GestureDetector(
                         onTap: ()
                         {
-                          Navigator.push(context, MaterialPageRoute(builder: (context)=> const SignInCustomer()));
+                          Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=> const SignInCustomer()));
                         },
                         child: Container(
                           margin: EdgeInsets.only(left: 30,right: 30),

@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 import 'dart:math';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -6,6 +7,8 @@ import 'package:firebase_database/ui/firebase_animated_list.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:lottie/lottie.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 
 // ignore: camel_case_types
 class Room_Photos extends StatefulWidget {
@@ -16,13 +19,13 @@ class Room_Photos extends StatefulWidget {
 }
 
 // ignore: camel_case_types
-bool isloding=false;
+bool isloding = false;
 
 class _Room_PhotosState extends State<Room_Photos> {
   final imagePicker = ImagePicker();
   late FirebaseAuth auth;
   var image;
-  bool isloding=false;
+  bool isloding = false;
 
   Future chooseImage(String name) async {
     if (name == 'Gallery') {
@@ -35,14 +38,15 @@ class _Room_PhotosState extends State<Room_Photos> {
       if (n2 >= n1) {
         n2 = n2 + 1;
       }
-      setState((){
-        isloding=true;
+      setState(() {
+        isloding = true;
       });
       Reference ref = FirebaseStorage.instance
           .ref()
           .child('room_owner')
           .child(auth.currentUser!.uid)
-          .child('room_photos').child('photo$n2');
+          .child('room_photos')
+          .child('photo$n2');
       await ref.putFile(File(profile!.path));
       ref.getDownloadURL().then((value) {
         setState(() {
@@ -63,24 +67,11 @@ class _Room_PhotosState extends State<Room_Photos> {
                     'Users/room_owners/${FirebaseAuth.instance.currentUser!.uid}/room_photos')
                 .child('photo$n2')
                 .update(map);
-            // FirebaseDatabase.instance
-            //     // ignore: deprecated_member_use
-            //     .reference()
-            //     .child(
-            //     'Users/all_users/${FirebaseAuth.instance.currentUser!.uid}/profile_image')
-            //     .once()
-            //     .then((value) {
-            //   setState(() {
-            //     url = value.snapshot.value as String?;
-            //   });
-            // });
           });
-          // print(value);
-          // image = url;
         });
       });
-      setState((){
-        isloding=false;
+      setState(() {
+        isloding = false;
       });
     } else if (name == 'Camera') {
       String? url;
@@ -90,17 +81,17 @@ class _Room_PhotosState extends State<Room_Photos> {
       if (n2 >= n1) {
         n2 = n2 + 1;
       }
-      final profile =
-          await ImagePicker().pickImage(source: ImageSource.camera);
+      final profile = await ImagePicker().pickImage(source: ImageSource.camera);
 
-      setState((){
-        isloding=true;
+      setState(() {
+        isloding = true;
       });
       Reference ref = FirebaseStorage.instance
           .ref()
           .child('room_owner')
           .child(auth.currentUser!.uid)
-          .child('profile_image').child('photo$n2');
+          .child('profile_image')
+          .child('photo$n2');
       await ref.putFile(File(profile!.path));
       ref.getDownloadURL().then((value) {
         setState(() {
@@ -110,7 +101,8 @@ class _Room_PhotosState extends State<Room_Photos> {
               // ignore: deprecated_member_use
               .reference()
               .child(
-                  'Users/all_users/${FirebaseAuth.instance.currentUser!.uid}/room_photos').child('photo$n2')
+                  'Users/all_users/${FirebaseAuth.instance.currentUser!.uid}/room_photos')
+              .child('photo$n2')
               .update(map)
               .then((value) {
             FirebaseDatabase.instance
@@ -120,41 +112,53 @@ class _Room_PhotosState extends State<Room_Photos> {
                     'Users/room_owners/${FirebaseAuth.instance.currentUser!.uid}/room_photos')
                 .child('photo$n2')
                 .update(map);
-            // FirebaseDatabase.instance
-            //     .reference()
-            //     .child(
-            //         'Users/all_users/${FirebaseAuth.instance.currentUser!.uid}/profile_image')
-            //     .once()
-            //     .then((value) {
-            //   setState(() {
-            //     url = value.snapshot.value as String?;
-            //   });
-            // });
           });
           // print(value);
           // image = url;
         });
       });
-      setState((){
-        isloding=false;
+      setState(() {
+        isloding = false;
       });
     }
   }
-  @override
 
+  bool list = true;
+  check() {
+    FirebaseDatabase.instance
+        .reference()
+        .child(
+            'Users/all_users/${FirebaseAuth.instance.currentUser!.uid}/room_photos')
+        .once()
+        .then((value) => {
+              if (value.snapshot.value == null)
+                {
+                  setState(() {
+                    list = false;
+                  })
+                }
+            });
+  }
+
+  @override
   void initState() {
     // TODO: implement initState
     super.initState();
     auth = FirebaseAuth.instance;
-    // ignore: deprecated_member_use
-    // _ref = FirebaseDatabase.instance.reference().child(
-    //     'Users/all_users/${FirebaseAuth.instance.currentUser!.uid}/room_photos');
+    check();
+  }
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
+          elevation: 0,
           backgroundColor: Colors.teal.withOpacity(0.5),
           automaticallyImplyLeading: false,
           title: const Text(
@@ -193,44 +197,84 @@ class _Room_PhotosState extends State<Room_Photos> {
             ),
           ],
         ),
-        body:isloding==false?buildHome():Center(child: Column(mainAxisAlignment: MainAxisAlignment.center,children: [
-          CircularProgressIndicator(color: Colors.blueAccent,),
-          SizedBox(height: 20,),
-          Text('Uploading...',style: TextStyle(color: Colors.grey,fontSize: 20),)
-        ],),)
-        );
-
+        body: isloding == false
+            ? list
+                ? buildHome()
+                : Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Lottie.asset('assets/lottie/empty.json'),
+                      Container(
+                        margin: EdgeInsets.only(left: 25, right: 25),
+                        child: Center(
+                            child: Text(
+                          'You have not uploaded anything..!',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(color: Colors.grey, fontSize: 25),
+                        )),
+                      )
+                    ],
+                  )
+            : Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    SpinKitThreeBounce(
+                      size: 40,
+                      color: Colors.blueAccent,
+                    ),
+                    SizedBox(
+                      height: 20,
+                    ),
+                    Text(
+                      'Uploading...',
+                      style: TextStyle(color: Colors.grey, fontSize: 20),
+                    )
+                  ],
+                ),
+              ));
   }
 }
 
 Widget buildHome() {
-  return isloding==false?FirebaseAnimatedList(
-      query: FirebaseDatabase.instance.reference().child(
-          'Users/all_users/${FirebaseAuth.instance.currentUser!.uid}/room_photos'),
-      itemBuilder: (BuildContext cotext, DataSnapshot snapshot,
-          Animation<double> animation, int index) {
-        Map<dynamic, dynamic>? owners = snapshot.value as Map?;
-        return _buildListView(owners!);
-      }):Center(child: Column(mainAxisAlignment: MainAxisAlignment.center,children: [
-    CircularProgressIndicator(color: Colors.blueAccent,),
-    SizedBox(height: 20,),
-    Text('Uploading...',style: TextStyle(color: Colors.grey,fontSize: 20),)
-  ],),);
+  return isloding == false
+      ? FirebaseAnimatedList(
+          query: FirebaseDatabase.instance.reference().child(
+              'Users/all_users/${FirebaseAuth.instance.currentUser!.uid}/room_photos'),
+          itemBuilder: (BuildContext cotext, DataSnapshot snapshot,
+              Animation<double> animation, int index) {
+            Map<dynamic, dynamic>? owners = snapshot.value as Map?;
+            return _buildListView(owners!);
+          })
+      : Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              CircularProgressIndicator(
+                color: Colors.blueAccent,
+              ),
+              SizedBox(
+                height: 20,
+              ),
+              Text(
+                'Uploading...',
+                style: TextStyle(color: Colors.grey, fontSize: 20),
+              )
+            ],
+          ),
+        );
 }
-
-
 
 Widget _buildListView(Map photos) {
   print(photos.length);
   return Container(
     height: 280,
     decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(8),
-        ),
+      borderRadius: BorderRadius.circular(8),
+    ),
     child: Image(
       fit: BoxFit.cover,
       image: NetworkImage(photos['photo_url']),
     ),
   );
 }
-

@@ -13,11 +13,11 @@ class VerifiedOwner extends StatefulWidget {
   @override
   State<VerifiedOwner> createState() => _VerifiedOwnerState();
 }
+
 String selectedItem = '';
 var data;
 
 class _VerifiedOwnerState extends State<VerifiedOwner> {
-
   DatabaseReference dataBRef = FirebaseDatabase.instance.reference();
   late final FirebaseAuth auth;
   bool isloding = false;
@@ -28,9 +28,9 @@ class _VerifiedOwnerState extends State<VerifiedOwner> {
   final locationController = TextEditingController();
   final emailController = TextEditingController();
   final passwordControll = TextEditingController();
+  final cityController = TextEditingController();
+  final nameController = TextEditingController();
   @override
-
-
   void initState() {
     // TODO: implement initState
     super.initState();
@@ -40,7 +40,7 @@ class _VerifiedOwnerState extends State<VerifiedOwner> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
-        color: Colors.orangeAccent.withOpacity(0.7),
+        color: Colors.orangeAccent.withOpacity(0.6),
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 30),
           child: ListView(
@@ -97,6 +97,23 @@ class _VerifiedOwnerState extends State<VerifiedOwner> {
                 height: 10,
               ),
               TextField(
+                controller: nameController,
+                style: const TextStyle(color: Colors.black),
+                decoration: InputDecoration(
+                  fillColor: Colors.white,
+                  filled: true,
+                  focusedBorder: const OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.white)),
+                  enabledBorder: const OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.white)),
+                  hintText: 'Room/Mess name..',
+                  hintStyle: const TextStyle(color: Colors.grey),
+                ),
+              ),
+              const SizedBox(
+                height: 10,
+              ),
+              TextField(
                 controller: mobileController,
                 style: const TextStyle(color: Colors.black),
                 decoration: InputDecoration(
@@ -127,6 +144,24 @@ class _VerifiedOwnerState extends State<VerifiedOwner> {
                     enabledBorder: const OutlineInputBorder(
                         borderSide: BorderSide(color: Colors.white)),
                     hintText: 'Location or Adress',
+                    hintStyle: const TextStyle(color: Colors.grey),
+                    suffixIcon: const Icon(
+                      Icons.location_on,
+                      color: Colors.grey,
+                    )),
+              ),
+              SizedBox(height: 10,),
+              TextField(
+                controller: cityController,
+                style: const TextStyle(color: Colors.black),
+                decoration: InputDecoration(
+                    fillColor: Colors.white,
+                    filled: true,
+                    focusedBorder: const OutlineInputBorder(
+                        borderSide: BorderSide(color: Colors.white)),
+                    enabledBorder: const OutlineInputBorder(
+                        borderSide: BorderSide(color: Colors.white)),
+                    hintText: 'City',
                     hintStyle: const TextStyle(color: Colors.grey),
                     suffixIcon: const Icon(
                       Icons.location_on,
@@ -212,8 +247,7 @@ class _VerifiedOwnerState extends State<VerifiedOwner> {
                 ],
               ),
               Padding(
-                padding:
-                const EdgeInsets.only(left: 30, right: 30, top: 30),
+                padding: const EdgeInsets.only(left: 30, right: 30, top: 30),
                 child: GestureDetector(
                     onTap: () {
                       if (fnameController.text.isEmpty ||
@@ -222,6 +256,8 @@ class _VerifiedOwnerState extends State<VerifiedOwner> {
                           locationController.text.isEmpty ||
                           emailController.text.isEmpty ||
                           passwordControll.text.isEmpty ||
+                          cityController.text.isEmpty ||
+                          nameController.text.isEmpty ||
                           selectedItem == '') {
                         Flushbar(
                           message: 'Fill all cridentials...',
@@ -236,7 +272,9 @@ class _VerifiedOwnerState extends State<VerifiedOwner> {
                             emailController.text.toString(),
                             mobileController.text.toString(),
                             locationController.text.toString(),
-                            selectedItem.toString());
+                            selectedItem.toString(),
+                            cityController.text,
+                            nameController.text);
                         registerOwner(emailController.text.toString(),
                             passwordControll.text.toString());
                       }
@@ -288,84 +326,83 @@ class _VerifiedOwnerState extends State<VerifiedOwner> {
       ),
     );
   }
+
   void registerOwner(String email, String password) {
     auth
-        .createUserWithEmailAndPassword(email: email, password: password).then((value) => {
-    Navigator.pushReplacement(context, MaterialPageRoute(builder: (context )=>SignUpOwner()))
-    }
-    );
-    //     .then((value) => {insertOwnerInfo(data)})
-    //     .onError((error, stackTrace) => {
-    //   Flushbar(
-    //     message: '$error',
-    //     flushbarPosition: FlushbarPosition.TOP,
-    //     backgroundColor: Colors.red,
-    //     duration: Duration(seconds: 3),
-    //   ).show(context)
-    // });
-
-  }
-
-  insertOwnerInfo(OwnerSignUpModal data) {
-    setState(() {
-      isloding = true;
-    });
-    dataBRef
-        .child('Users')
-        .child('all_users')
-        .child(auth.currentUser!.uid)
-        .set({
-      'first_name': data.fname,
-      'last_name': data.lname,
-      'email': data.email,
-      'location': data.location,
-      'mobile_number': data.mobileNo,
-      'role': data.role
-    }).then((value) => {
-      if (data.role == 'room_owner')
-        {
-          dataBRef
-              .child('Users')
-              .child('room_owners')
-              .child(auth.currentUser!.uid)
-              .set({
-            'first_name': data.fname,
-            'last_name': data.lname,
-            'email': data.email,
-            'location': data.location,
-            'mobile_number': data.mobileNo,
-            'role': data.role,
-            'id': auth.currentUser!.uid
-          })
-        }
-      else if (data.role == 'mess_owner')
-        {
-          dataBRef
-              .child('Users')
-              .child('mess_owners')
-              .child(auth.currentUser!.uid)
-              .set({
-            'first_name': data.fname,
-            'last_name': data.lname,
-            'email': data.email,
-            'location': data.location,
-            'mobile_number': data.mobileNo,
-            'role': data.role,
-            'id': auth.currentUser!.uid
-          })
-        }
-    });
-    Navigator.pushReplacement(
-        context, MaterialPageRoute(builder: (context) => const SignInOwner()));
-    Flushbar(
-      message: 'Account created succesfully login to get started.',
+        .createUserWithEmailAndPassword(email: email, password: password)
+        .then((value) => {
+              Navigator.pushReplacement(context,
+                  MaterialPageRoute(builder: (context) => SignUpOwner()))
+            }).onError((error, stackTrace) => {
+      Flushbar(
+      message: '$error',
       flushbarPosition: FlushbarPosition.TOP,
-      backgroundColor: Colors.green,
+      backgroundColor: Colors.red,
       duration: Duration(seconds: 3),
-    ).show(context);
-
-    setState(() {
-      isloding = false;
+      ).show(context)
     });
   }
+
+  // insertOwnerInfo(OwnerSignUpModal data) {
+  //   setState(() {
+  //     isloding = true;
+  //   });
+  //   dataBRef
+  //       .child('Users')
+  //       .child('all_users')
+  //       .child(auth.currentUser!.uid)
+  //       .set({
+  //     'first_name': data.fname,
+  //     'last_name': data.lname,
+  //     'email': data.email,
+  //     'location': data.location,
+  //     'mobile_number': data.mobileNo,
+  //     'role': data.role
+  //   }).then((value) => {
+  //     if (data.role == 'room_owner')
+  //       {
+  //         dataBRef
+  //             .child('Users')
+  //             .child('room_owners')
+  //             .child(auth.currentUser!.uid)
+  //             .set({
+  //           'first_name': data.fname,
+  //           'last_name': data.lname,
+  //           'email': data.email,
+  //           'location': data.location,
+  //           'mobile_number': data.mobileNo,
+  //           'role': data.role,
+  //           'id': auth.currentUser!.uid
+  //         })
+  //       }
+  //     else if (data.role == 'mess_owner')
+  //       {
+  //         dataBRef
+  //             .child('Users')
+  //             .child('mess_owners')
+  //             .child(auth.currentUser!.uid)
+  //             .set({
+  //           'first_name': data.fname,
+  //           'last_name': data.lname,
+  //           'email': data.email,
+  //           'location': data.location,
+  //           'mobile_number': data.mobileNo,
+  //           'role': data.role,
+  //           'id': auth.currentUser!.uid
+  //         })
+  //       }
+  //   });
+  //   Navigator.pushReplacement(
+  //       context, MaterialPageRoute(builder: (context) => const SignInOwner()));
+  //   Flushbar(
+  //     message: 'Account created succesfully login to get started.',
+  //     flushbarPosition: FlushbarPosition.TOP,
+  //     backgroundColor: Colors.green,
+  //     duration: Duration(seconds: 3),
+  //   ).show(context);
+  //
+  //   setState(() {
+  //     isloding = false;
+  //   });
+  // }
 }

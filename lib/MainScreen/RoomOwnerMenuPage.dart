@@ -62,6 +62,7 @@ class _RoomOwnerMenuPage extends State<RoomOwnerMenuPage> {
           ? CustomScrollView(
               slivers: <Widget>[
                 SliverAppBar(
+                  automaticallyImplyLeading: false,
                   title: Container(
                     margin: const EdgeInsets.only(top: 7),
                     child: Row(
@@ -111,95 +112,103 @@ class _RoomOwnerMenuPage extends State<RoomOwnerMenuPage> {
                 SliverToBoxAdapter(
                   child: Container(
                     //padding: const EdgeInsets.all(10),
-                    margin: const EdgeInsets.only(left: 6, right: 6),
-                    color: Colors.white,
+                    //margin: const EdgeInsets.only(left: 6, right: 6),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        GestureDetector(
-                          onTap: () {
-                            setState(() {
-                              isloding = true;
-                            });
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => const Home()));
+                        Container(
+                          margin: const EdgeInsets.only(left: 6, right: 6),
+                          child: GestureDetector(
+                            onTap: () {
+                              setState(() {
+                                isloding = true;
+                              });
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => const Home()));
 
-                            setState(() {
-                              isloding = false;
-                            });
-                          },
-                          child: Card(
-                            elevation: 0,
-                            child: ListTile(
-                              shape: RoundedRectangleBorder(
-                                  side: const BorderSide(
-                                    color: Colors.black,
-                                    width: 1,
-                                  ),
-                                  borderRadius: BorderRadius.circular(8)),
-                              leading: const Icon(
-                                Icons.home_outlined,
-                                size: 30,
-                              ),
-                              subtitle: const Text(
-                                'Find rooms and flats as per your need.',
-                                style:
-                                    TextStyle(color: Colors.grey, fontSize: 15),
-                              ),
-                              title: const Text(
-                                'Rooms',
-                                style: TextStyle(
-                                    color: Colors.black, fontSize: 25),
-                              ),
-                              trailing: const Icon(
-                                Icons.arrow_right_outlined,
-                                size: 30,
+                              setState(() {
+                                isloding = false;
+                              });
+                            },
+                            child: Card(
+                              elevation: 0,
+                              child: ListTile(
+                                shape: RoundedRectangleBorder(
+                                    side: const BorderSide(
+                                      color: Colors.black,
+                                      width: 1,
+                                    ),
+                                    borderRadius: BorderRadius.circular(0)),
+                                leading: const Icon(
+                                  Icons.home_outlined,
+                                  size: 30,
+                                  color: Colors.brown,
+                                ),
+                                subtitle: const Text(
+                                  'Find rooms and flats as per your need.',
+                                  style: TextStyle(
+                                      color: Colors.grey, fontSize: 15),
+                                ),
+                                title: const Text(
+                                  'Rooms',
+                                  style: TextStyle(
+                                      color: Colors.black, fontSize: 25),
+                                ),
+                                trailing: const Icon(
+                                  Icons.arrow_right_outlined,
+                                  size: 30,
+                                ),
                               ),
                             ),
                           ),
                         ),
-                        GestureDetector(
-                          onTap: () {
-                            setState(() {
-                              isloding = true;
-                            });
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => const MessOwners()));
+                        Container(
+                          margin: const EdgeInsets.only(left: 6, right: 6),
+                          child: GestureDetector(
+                            onTap: () {
+                              setState(() {
+                                isloding = true;
+                              });
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) =>
+                                          const MessOwners()));
 
-                            setState(() {
-                              isloding = false;
-                            });
-                          },
-                          child: Card(
-                            elevation: 0,
-                            child: ListTile(
-                              shape: RoundedRectangleBorder(
-                                  side: const BorderSide(
-                                    color: Colors.black,
-                                    width: 1,
-                                  ),
-                                  borderRadius: BorderRadius.circular(8)),
-                              leading: const Icon(
-                                Icons.food_bank_outlined,
-                                size: 30,
-                              ),
-                              subtitle: const Text(
-                                'Find best mess for you..',
-                                style:
-                                    TextStyle(color: Colors.grey, fontSize: 15),
-                              ),
-                              title: const Text(
-                                'Mess',
-                                style: TextStyle(
-                                    color: Colors.black, fontSize: 25),
-                              ),
-                              trailing: const Icon(
-                                Icons.arrow_right_outlined,
-                                size: 30,
+                              setState(() {
+                                isloding = false;
+                              });
+                            },
+                            child: Card(
+                              elevation: 0,
+                              child: ListTile(
+                                shape: RoundedRectangleBorder(
+                                    side: const BorderSide(
+                                      color: Colors.black,
+                                      width: 1,
+                                    ),
+                                    borderRadius: BorderRadius.circular(1)),
+                                leading: const Icon(
+                                  Icons.food_bank_outlined,
+                                  size: 30,
+                                  color: Colors.orange,
+                                ),
+                                subtitle: const Text(
+                                  'Find best mess for you..',
+                                  style: TextStyle(
+                                      color: Colors.grey, fontSize: 15),
+                                ),
+                                title: const Text(
+                                  'Mess',
+                                  style: TextStyle(
+                                      color: Colors.black, fontSize: 25),
+                                ),
+                                trailing: const Icon(
+                                  Icons.arrow_right_outlined,
+                                  size: 30,
+                                ),
                               ),
                             ),
                           ),

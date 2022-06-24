@@ -28,6 +28,7 @@ class _OwnerProfileToVisitState extends State<OwnerProfileToVisit> {
   var email;
   var phoneNumber;
   var location;
+  var name;
   var aboutOwner = 'Not available yet..Wait until owner upload it.';
   // ignore: prefer_typing_uninitialized_variables
   var image;
@@ -64,6 +65,7 @@ class _OwnerProfileToVisitState extends State<OwnerProfileToVisit> {
           fname = map!['first_name'];
           lname = map['last_name'];
           email = map['email'];
+          name=map['name'];
           location = map['location'];
           phoneNumber = map['mobile_number'];
           aboutOwner = map['about_owner'] ??
@@ -248,6 +250,16 @@ class _OwnerProfileToVisitState extends State<OwnerProfileToVisit> {
                 style: const TextStyle(
                   color: Colors.black,
                   fontSize: 20,
+                ),
+              ),
+              const SizedBox(
+                height: 5,
+              ),
+              Text(
+                '$name',
+                style: const TextStyle(
+                  color: Colors.grey,
+                  fontSize: 15,
                 ),
               ),
               const SizedBox(
