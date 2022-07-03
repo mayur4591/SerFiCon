@@ -1,7 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
-import 'package:serficon/Bottom_nav/mess_owner_list.dart';
+
+import '../List_of_owners/mess_owner_list.dart';
 
 class MessOwnerProfileToVisit extends StatefulWidget {
   const MessOwnerProfileToVisit({Key? key}) : super(key: key);

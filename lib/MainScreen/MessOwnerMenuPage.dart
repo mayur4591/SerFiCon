@@ -1,11 +1,11 @@
 // ignore_for_file: deprecated_member_use
-
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
-import '../Bottom_nav/roomOwnerList.dart';
-import '../Bottom_nav/mess_owner_list.dart';
+import 'package:serficon/Notification.dart';
+import '../List_of_owners/mess_owner_list.dart';
+import '../List_of_owners/roomOwnerList.dart';
 import '../MessOwnerProfile/MessOwnerProfile.dart';
 
 class MessOwnerMenuPage extends StatefulWidget {
@@ -54,6 +54,7 @@ class _MessOwnerMenuPage extends State<MessOwnerMenuPage> {
     // TODO: implement initState
     super.initState();
     // ignore: deprecated_member_use
+    retriveData();
     retriveData();
     findRole();
   }
@@ -188,6 +189,7 @@ class _MessOwnerMenuPage extends State<MessOwnerMenuPage> {
                   const SizedBox(
                     height: 450,
                   ),
+
                 ],
               ),
             ),

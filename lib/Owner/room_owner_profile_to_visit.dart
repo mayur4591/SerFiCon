@@ -1,11 +1,11 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
-import 'package:serficon/Bottom_nav/roomOwnerList.dart';
 import '../About/about_rooms.dart';
 import '../About/facilities.dart';
 import '../About/photos.dart';
 import '../About/ristrictions.dart';
+import '../List_of_owners/roomOwnerList.dart';
 
 class OwnerProfileToVisit extends StatefulWidget {
   const OwnerProfileToVisit({Key? key}) : super(key: key);
@@ -30,10 +30,9 @@ class _OwnerProfileToVisitState extends State<OwnerProfileToVisit> {
   var location;
   var name;
   var aboutOwner = 'Not available yet..Wait until owner upload it.';
-  // ignore: prefer_typing_uninitialized_variables
   var image;
   late String url;
-  // ignore: non_constant_identifier_names
+
   final Image profile_image = const Image(
       image: AssetImage("assets/images/profile_png.jpg"),
       fit: BoxFit.cover,
@@ -65,7 +64,7 @@ class _OwnerProfileToVisitState extends State<OwnerProfileToVisit> {
           fname = map!['first_name'];
           lname = map['last_name'];
           email = map['email'];
-          name=map['name'];
+          name = map['name'];
           location = map['location'];
           phoneNumber = map['mobile_number'];
           aboutOwner = map['about_owner'] ??

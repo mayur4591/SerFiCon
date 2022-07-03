@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_database/ui/firebase_animated_list.dart';
 import 'package:lottie/lottie.dart';
-import 'package:serficon/Bottom_nav/roomOwnerList.dart';
-import 'package:serficon/MessOwnerProfile/MessOwnerProfile.dart';
 import 'package:serficon/MessOwnerProfile/MessOwnerProfileToVisit.dart';
 
 class MessOwners extends StatefulWidget {
@@ -20,11 +17,10 @@ String idFromMessList = '';
 
 class _MessOwners extends State<MessOwners> {
   late Query _ref;
-  final searchQueryContoller=TextEditingController();
-  String query='';
-   Icon icon=Icon(Icons.search_rounded);
-   Widget customeSearchBar=Text('Available mess owners.',style: TextStyle(color: Colors.black),);
   bool list = true;
+  bool veg = false;
+  bool nonveg = false;
+
   check() {
     _ref.once().then((value) => {
           if (value.snapshot.value == null)
@@ -36,64 +32,45 @@ class _MessOwners extends State<MessOwners> {
         });
   }
 
-  bool veg = false;
-  bool nonveg = false;
-
-  // Future<void> getfoodType() async {
-  //   FirebaseDatabase.instance
-  //       .reference()
-  //       .child(
-  //           'Users/mess_owners/$idFromMessList/food_type')
-  //       .once()
-  //       .then((value) {
-  //     setState(() {
-  //       Map<dynamic, dynamic> map = value.snapshot.value as Map;
-  //       veg = map['veg'] ?? false;
-  //       nonveg = map['nonveg'] ?? false;
-  //     });
-  //   });
-  // }
-
   @override
   void initState() {
     // TODO: implement initState
 
     super.initState();
     // ignore: deprecated_member_use
-    _ref = FirebaseDatabase.instance.reference().child('Users/mess_owners');
-    //getfoodType();
+    _ref = FirebaseDatabase.instance.reference().child('Users/mess_owners').orderByChild('name'); 
     check();
   }
-bool getVegStatus(String id)
-{
-  FirebaseDatabase.instance
-      .reference()
-      .child(
-      'Users/mess_owners/$idFromMessList/food_type')
-      .once()
-      .then((value) {
-    setState(() {
-      Map<dynamic, dynamic> map = value.snapshot.value as Map;
-      veg = map['veg'] ?? false;
+
+  bool getVegStatus(String id) {
+    FirebaseDatabase.instance
+        .reference()
+        .child('Users/mess_owners/$idFromMessList/food_type')
+        .once()
+        .then((value) {
+      setState(() {
+        Map<dynamic, dynamic> map = value.snapshot.value as Map;
+        veg = map['veg'] ?? false;
+      });
     });
-  });
-  return veg;
-}
- bool getNonVegStateus(String id)
-{
-  FirebaseDatabase.instance
-      .reference()
-      .child(
-      'Users/mess_owners/$idFromMessList/')
-      .once()
-      .then((value) {
-    setState(() {
-      Map<dynamic, dynamic> map = value.snapshot.value as Map;
-      nonveg = map['nonveg'] ?? false;
+    return veg;
+  }
+
+  bool getNonVegStateus(String id) {
+    FirebaseDatabase.instance
+        // ignore: deprecated_member_use
+        .reference()
+        .child('Users/mess_owners/$idFromMessList/')
+        .once()
+        .then((value) {
+      setState(() {
+        Map<dynamic, dynamic> map = value.snapshot.value as Map;
+        nonveg = map['nonveg'] ?? false;
+      });
     });
-  });
-  return nonveg;
-}
+    return nonveg;
+  }
+
   Widget _buildListView(Map owners) {
     return Card(
       elevation: 1,
@@ -217,9 +194,11 @@ bool getVegStatus(String id)
                   width: 5,
                 ),
                 //SizedBox(width: 10,),
-                (owners['veg']!=null && owners['veg']==true)
+                (owners['veg'] != null && owners['veg'] == true)
                     ? Visibility(
-                        visible: owners['veg']!=null?owners['veg']:false,//getVegStatus(owners['id']),
+                        visible: owners['veg'] != null
+                            ? owners['veg']
+                            : false, //getVegStatus(owners['id']),
                         child: Row(
                           children: [
                             Container(
@@ -254,7 +233,10 @@ bool getVegStatus(String id)
                         ),
                       )
                     : Visibility(
-                        visible: ( owners['nonveg']!=null && owners['nonveg']==true)?owners['nonveg']:false,//getNonVegStateus(owners['id']),
+                        visible: (owners['nonveg'] != null &&
+                                owners['nonveg'] == true)
+                            ? owners['nonveg']
+                            : false, //getNonVegStateus(owners['id']),
                         child: Row(
                           children: [
                             Container(
@@ -289,13 +271,14 @@ bool getVegStatus(String id)
                           ],
                         ),
                       )
-                //SizedBox(width: 10,),
-                //SizedBox(width: 10,),
               ],
             ),
-            (owners['veg']!=null && owners['veg']==true && owners['nonveg']==true)
-            ?  Visibility(
-                    visible: owners['nonveg']!=null?owners['nonveg']:false,
+            (owners['veg'] != null &&
+                    owners['veg'] == true &&
+                    owners['nonveg'] == true)
+                ? Visibility(
+                    visible:
+                        owners['nonveg'] != null ? owners['nonveg'] : false,
                     child: Row(
                       children: [
                         Container(
@@ -331,8 +314,8 @@ bool getVegStatus(String id)
                         ),
                       ],
                     ),
-                  ):Text('')
-
+                  )
+                : Text('')
           ],
         ),
       ),
@@ -343,48 +326,10 @@ bool getVegStatus(String id)
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        actions: [
-          IconButton(onPressed: (){
-            setState((){
-              if(this.icon.icon==Icons.search_rounded)
-                {
-                  this.icon=Icon(Icons.cancel);
-                  this.customeSearchBar= ListTile(
-                    trailing: Icon(Icons.search_rounded),
-                    title: TextField(
-                      onChanged: makeQuery,
-                      controller: searchQueryContoller,
-                        decoration: InputDecoration(
-                          border: InputBorder.none,
-                            hintText: 'Search by city or mess name.'
-                        ),
-                        textInputAction: TextInputAction.go,
-                        style: TextStyle(
-                          color: Colors.black,
-                          fontSize: 16,
-
-                        ),
-                      ),
-                  );
-
-
-                }
-              else
-                {
-
-                    this.customeSearchBar=Text('Available mess owners.',style: TextStyle(color: Colors.black),);
-                    this.icon=Icon(Icons.search_rounded);
-
-                }
-            });
-
-          }, icon:icon)
-        ],
-        automaticallyImplyLeading: false,
-        elevation: 0,
-        backgroundColor: Colors.orangeAccent.withOpacity(.4),
-        title: customeSearchBar
-      ),
+          automaticallyImplyLeading: false,
+          elevation: 0,
+          backgroundColor: Colors.orangeAccent.withOpacity(.4),
+          title: Text('Available Mess Owners',style: TextStyle(color: Colors.black),)),
       body: list
           ? buildHome()
           : Column(
@@ -407,28 +352,11 @@ bool getVegStatus(String id)
 
   Widget buildHome() {
     return FirebaseAnimatedList(
-        query: query==''? _ref:FirebaseDatabase.instance.reference().child('Users/mess_owners').orderByChild('city').equalTo(query),
+        query: _ref,
         itemBuilder: (BuildContext cotext, DataSnapshot snapshot,
             Animation<double> animation, int index) {
           Map<dynamic, dynamic>? owners = snapshot.value as Map?;
           return _buildListView(owners!);
         });
-  }
-
-  // void SearchMess(String query) {
-  //   final messname=;
-  //   final cityname=;
-  //   final input=query.toLowerCase();
-  //
-  //   return
-  // }
-
-
-
-
-  void makeQuery(String value) {
-    setState((){
-      query=value;
-    });
   }
 }

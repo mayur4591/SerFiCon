@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:serficon/Pages/signUpCustomer.dart';
 import 'package:serficon/Pages/verifyCustomerEmail.dart';
 
-
 class VerifyCustomer extends StatefulWidget {
   const VerifyCustomer({Key? key}) : super(key: key);
 

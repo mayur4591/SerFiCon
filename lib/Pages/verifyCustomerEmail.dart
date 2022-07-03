@@ -13,7 +13,8 @@ class CustomerEmailVerification extends StatefulWidget {
   const CustomerEmailVerification({Key? key}) : super(key: key);
 
   @override
-  State<CustomerEmailVerification> createState() => _CustomerEmailVerificationState();
+  State<CustomerEmailVerification> createState() =>
+      _CustomerEmailVerificationState();
 }
 
 class _CustomerEmailVerificationState extends State<CustomerEmailVerification> {
@@ -159,6 +160,7 @@ class _CustomerEmailVerificationState extends State<CustomerEmailVerification> {
 
   returnWidget() {
     insertDate(customerdata);
+    Navigator.pop(context,false);
     return SignInCustomer();
   }
 

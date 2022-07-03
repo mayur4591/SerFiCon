@@ -4,9 +4,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
-
-import '../Bottom_nav/roomOwnerList.dart';
-import '../Bottom_nav/mess_owner_list.dart';
+import '../List_of_owners/mess_owner_list.dart';
+import '../List_of_owners/roomOwnerList.dart';
 import '../Owner/ownerProfile.dart';
 
 class RoomOwnerMenuPage extends StatefulWidget {

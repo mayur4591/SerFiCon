@@ -1,5 +1,4 @@
 import 'dart:math';
-
 import 'package:expandable/expandable.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
@@ -20,8 +19,8 @@ class _About_RulesState extends State<About_Rules> {
   final titlecontroller = TextEditingController();
   final ruleController = TextEditingController();
   late Query _ref;
-  final DatabaseReference reference=FirebaseDatabase.instance.reference();
-  bool isloding=false;
+  final DatabaseReference reference = FirebaseDatabase.instance.reference();
+  bool isloding = false;
 
   @override
   void dispose() {
@@ -29,31 +28,32 @@ class _About_RulesState extends State<About_Rules> {
     ruleController.dispose();
     super.dispose();
   }
+
   bool list = true;
   check() {
     FirebaseDatabase.instance
         .reference()
         .child(
-        'Users/all_users/${FirebaseAuth.instance.currentUser!.uid}/ristrictions')
+            'Users/all_users/${FirebaseAuth.instance.currentUser!.uid}/ristrictions')
         .once()
         .then((value) => {
-      if (value.snapshot.value == null)
-        {
-          setState(() {
-            list = false;
-          })
-        }
-    });
+              if (value.snapshot.value == null)
+                {
+                  setState(() {
+                    list = false;
+                  })
+                }
+            });
   }
+
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
     check();
-    _ref = FirebaseDatabase.instance.reference().child('Users/all_users/${FirebaseAuth.instance.currentUser!.uid}/ristrictions');
-
+    _ref = FirebaseDatabase.instance.reference().child(
+        'Users/all_users/${FirebaseAuth.instance.currentUser!.uid}/ristrictions');
   }
-
 
   Future openDialoge() => showDialog(
         context: context,
@@ -116,27 +116,38 @@ class _About_RulesState extends State<About_Rules> {
                       behavior: SnackBarBehavior.floating,
                     ));
                   } else {
-                    setState((){
-                      isloding=true;
+                    setState(() {
+                      isloding = true;
                     });
-                    var r=Random();
-                    var n1=r.nextInt(16);
-                    var n2=r.nextInt(15);
-                    if(n2>=n1)
-                    {
-                      n2=n2+1;
+                    var r = Random();
+                    var n1 = r.nextInt(16);
+                    var n2 = r.nextInt(15);
+                    if (n2 >= n1) {
+                      n2 = n2 + 1;
                     }
-                    Map<String,dynamic> map={'ruletitle':titlecontroller.text.toString(),'ruledisc':ruleController.text.toString()};
-                    reference.child('Users/all_users/${FirebaseAuth.instance.currentUser!.uid}/ristrictions').child('rule$n2').update(map).then((value) {
-                      reference.child('Users/room_owners/${FirebaseAuth.instance.currentUser!.uid}/ristrictions').child('rule$n2').update(map);
+                    Map<String, dynamic> map = {
+                      'ruletitle': titlecontroller.text.toString(),
+                      'ruledisc': ruleController.text.toString()
+                    };
+                    reference
+                        .child(
+                            'Users/all_users/${FirebaseAuth.instance.currentUser!.uid}/ristrictions')
+                        .child('rule$n2')
+                        .update(map)
+                        .then((value) {
+                      reference
+                          .child(
+                              'Users/room_owners/${FirebaseAuth.instance.currentUser!.uid}/ristrictions')
+                          .child('rule$n2')
+                          .update(map);
                     });
 
                     Navigator.of(context, rootNavigator: true).pop('dialog');
                     ruleController.text = '';
                     titlecontroller.text = '';
                   }
-                  setState((){
-                    isloding=false;
+                  setState(() {
+                    isloding = false;
                   });
                 },
                 child: const Text('ADD'))
@@ -152,14 +163,12 @@ class _About_RulesState extends State<About_Rules> {
             title: ExpandablePanel(
                 header: Text(
                   rule['ruletitle'],
-                  style: const TextStyle(
-                      fontSize: 25, color: Colors.black),
+                  style: const TextStyle(fontSize: 25, color: Colors.black),
                 ),
                 collapsed: const Text(''),
                 expanded: Text(
                   rule['ruledisc'],
-                  style: const TextStyle(
-                      fontSize: 20, color: Colors.grey),
+                  style: const TextStyle(fontSize: 20, color: Colors.grey),
                 ))));
   }
 
@@ -182,26 +191,41 @@ class _About_RulesState extends State<About_Rules> {
             openDialoge();
           },
         ),
-        body: isloding==false? list?buildHome():Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Lottie.asset('assets/lottie/empty.json'),
-            Container(
-              margin: EdgeInsets.only(left: 25, right: 25),
-              child: Center(
-                  child: Text(
-                    'You have not uploaded anything..!',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(color: Colors.grey, fontSize: 25),
-                  )),
-            )
-          ],
-        ):Center(child: Column(mainAxisAlignment: MainAxisAlignment.center,children: [
-          CircularProgressIndicator(color: Colors.blueAccent,),
-          SizedBox(height: 20,),
-          Text('Uploading...',style: TextStyle(color: Colors.grey,fontSize: 20),)
-        ],),)
-        );
+        body: isloding == false
+            ? list
+                ? buildHome()
+                : Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Lottie.asset('assets/lottie/empty.json'),
+                      Container(
+                        margin: EdgeInsets.only(left: 25, right: 25),
+                        child: Center(
+                            child: Text(
+                          'You have not uploaded anything..!',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(color: Colors.grey, fontSize: 25),
+                        )),
+                      )
+                    ],
+                  )
+            : Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    CircularProgressIndicator(
+                      color: Colors.blueAccent,
+                    ),
+                    SizedBox(
+                      height: 20,
+                    ),
+                    Text(
+                      'Uploading...',
+                      style: TextStyle(color: Colors.grey, fontSize: 20),
+                    )
+                  ],
+                ),
+              ));
   }
 
   Widget buildHome() {

@@ -73,37 +73,34 @@ class _ForgetPasswordState extends State<ForgetPassword> {
               ),
               GestureDetector(
                 onTap: () async {
-                  if(emailController.text=='')
-                    {
+                  if (emailController.text == '') {
+                    Flushbar(
+                      message: 'Give email...',
+                      flushbarPosition: FlushbarPosition.TOP,
+                      backgroundColor: Colors.red,
+                      duration: Duration(seconds: 3),
+                    ).show(context);
+                  } else {
+                    await FirebaseAuth.instance
+                        .sendPasswordResetEmail(email: emailController.text)
+                        .then((value) {
                       Flushbar(
-                        message:'Give email...',
+                        message: 'email sent check your inbox...',
                         flushbarPosition: FlushbarPosition.TOP,
-                        backgroundColor: Colors.red,
+                        backgroundColor: Colors.green,
                         duration: Duration(seconds: 3),
                       ).show(context);
-                    }
-                  else
-                    {
-                      await  FirebaseAuth.instance.sendPasswordResetEmail(email: emailController.text).then((value)  {
-                        Flushbar(
-                          message:'email sent check your inbox...',
-                          flushbarPosition: FlushbarPosition.TOP,
-                          backgroundColor: Colors.green,
-                          duration: Duration(seconds: 3),
-                        ).show(context);
-                      })
-                      .onError((error, stackTrace)  {
-                        Flushbar(
-                          message: '$error',
-                          flushbarPosition: FlushbarPosition.TOP,
-                          duration: Duration(seconds: 3),
-                          backgroundColor: Colors.red,
-                        ).show(context);
-                      });
-                    }
+                    }).onError((error, stackTrace) {
+                      Flushbar(
+                        message: '$error',
+                        flushbarPosition: FlushbarPosition.TOP,
+                        duration: Duration(seconds: 3),
+                        backgroundColor: Colors.red,
+                      ).show(context);
+                    });
+                  }
 
-                  emailController.text='';
-
+                  emailController.text = '';
                 },
                 child: Container(
                   decoration: BoxDecoration(

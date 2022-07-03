@@ -4,9 +4,7 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_database/ui/firebase_animated_list.dart';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
-
-import '../Bottom_nav/roomOwnerList.dart';
-import '../Modal Classes/ristrictions_model.dart';
+import 'package:serficon/List_of_owners/roomOwnerList.dart';
 
 class Ristrictions extends StatefulWidget {
   const Ristrictions({Key? key}) : super(key: key);
@@ -31,16 +29,16 @@ class _RistrictionsState extends State<Ristrictions> {
     FirebaseDatabase.instance
         .reference()
         .child(
-        'Users/all_users/${FirebaseAuth.instance.currentUser!.uid}/ristrictions')
+            'Users/all_users/$idFromRoomOwnerList/ristrictions')
         .once()
         .then((value) => {
-      if (value.snapshot.value == null)
-        {
-          setState(() {
-            list = false;
-          })
-        }
-    });
+              if (value.snapshot.value == null)
+                {
+                  setState(() {
+                    list = false;
+                  })
+                }
+            });
   }
 
   @override
@@ -90,22 +88,23 @@ class _RistrictionsState extends State<Ristrictions> {
           ),
           backgroundColor: Colors.lightGreen.withOpacity(0.5),
         ),
-        body: list?buildHome() :Column(
-    mainAxisAlignment: MainAxisAlignment.center,
-    children: [
-    Lottie.asset('assets/lottie/empty.json'),
-    Container(
-    margin: EdgeInsets.only(left: 25, right: 25),
-    child: Center(
-    child: Text(
-    'Not uploaded yet ..!',
-    textAlign: TextAlign.center,
-    style: TextStyle(color: Colors.grey, fontSize: 25),
-    )),
-    )
-    ],
-    )
-    );
+        body: list
+            ? buildHome()
+            : Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Lottie.asset('assets/lottie/empty.json'),
+                  Container(
+                    margin: EdgeInsets.only(left: 25, right: 25),
+                    child: Center(
+                        child: Text(
+                      'Not uploaded yet ..!',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(color: Colors.grey, fontSize: 25),
+                    )),
+                  )
+                ],
+              ));
   }
 
   Widget buildHome() {

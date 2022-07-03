@@ -6,23 +6,11 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:internet_connection_checker/internet_connection_checker.dart';
 import 'package:lottie/lottie.dart';
-import 'package:serficon/Bottom_nav/mess_owner_list.dart';
-import 'package:serficon/Bottom_nav/roomOwnerList.dart';
 import 'package:serficon/MainScreen/CustomerMenuPage.dart';
 import 'package:serficon/MainScreen/MessOwnerMenuPage.dart';
 import 'package:serficon/MainScreen/RoomOwnerMenuPage.dart';
-import 'package:serficon/MessOwnerProfile/MessOwnerProfile.dart';
-import 'package:serficon/Owner/Drawer.dart';
-import 'package:serficon/Owner/ownerProfile.dart';
-import 'package:serficon/Pages/signInCustomer.dart';
-import 'package:serficon/Pages/signInOwner.dart';
-import 'package:serficon/Pages/signUpCustomer.dart';
-import 'package:serficon/Pages/signUpOwner.dart';
 import 'package:serficon/Pages/welcomeScreen.dart';
-import 'package:serficon/User/userprofile.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
-import 'Pages/emailverificationpage.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();

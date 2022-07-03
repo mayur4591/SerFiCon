@@ -4,7 +4,8 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_database/ui/firebase_animated_list.dart';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
-import 'package:serficon/Bottom_nav/roomOwnerList.dart';
+
+import '../List_of_owners/roomOwnerList.dart';
 
 class Facilities extends StatefulWidget {
   const Facilities({Key? key}) : super(key: key);
@@ -21,16 +22,16 @@ class _FacilitiesState extends State<Facilities> {
     FirebaseDatabase.instance
         .reference()
         .child(
-        'Users/all_users/${FirebaseAuth.instance.currentUser!.uid}/facilities')
+            'Users/all_users/${FirebaseAuth.instance.currentUser!.uid}/facilities')
         .once()
         .then((value) => {
-      if (value.snapshot.value == null)
-        {
-          setState(() {
-            list = false;
-          })
-        }
-    });
+              if (value.snapshot.value == null)
+                {
+                  setState(() {
+                    list = false;
+                  })
+                }
+            });
   }
 
   @override
@@ -38,7 +39,9 @@ class _FacilitiesState extends State<Facilities> {
     // TODO: implement initState
     super.initState();
     check();
-    _ref = FirebaseDatabase.instance.reference().child('Users/room_owners/$idFromRoomOwnerList/facilities');
+    _ref = FirebaseDatabase.instance
+        .reference()
+        .child('Users/room_owners/$idFromRoomOwnerList/facilities');
   }
 
   Widget _buildListView(Map facility) {
@@ -49,14 +52,12 @@ class _FacilitiesState extends State<Facilities> {
             title: ExpandablePanel(
                 header: Text(
                   facility['title'],
-                  style: const TextStyle(
-                      fontSize: 25, color: Colors.black),
+                  style: const TextStyle(fontSize: 25, color: Colors.black),
                 ),
                 collapsed: const Text(''),
                 expanded: Text(
                   facility['facility'],
-                  style: const TextStyle(
-                      fontSize: 20, color: Colors.grey),
+                  style: const TextStyle(fontSize: 20, color: Colors.grey),
                 ))));
   }
 
@@ -67,22 +68,28 @@ class _FacilitiesState extends State<Facilities> {
         automaticallyImplyLeading: false,
         backgroundColor: Colors.green.withOpacity(0.6),
         elevation: 0,
-        title: const Text('Facilities',style: TextStyle(color: Colors.black),),),
-      body: list? buildHome():Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Lottie.asset('assets/lottie/empty.json'),
-          Container(
-            margin: EdgeInsets.only(left: 25, right: 25),
-            child: Center(
-                child: Text(
-                  'Not uploaded yet...!',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(color: Colors.grey, fontSize: 25),
-                )),
-          )
-        ],
+        title: const Text(
+          'Facilities',
+          style: TextStyle(color: Colors.black),
+        ),
       ),
+      body: list
+          ? buildHome()
+          : Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Lottie.asset('assets/lottie/empty.json'),
+                Container(
+                  margin: EdgeInsets.only(left: 25, right: 25),
+                  child: Center(
+                      child: Text(
+                    'Not uploaded yet...!',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(color: Colors.grey, fontSize: 25),
+                  )),
+                )
+              ],
+            ),
     );
   }
 

@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -14,15 +13,16 @@ class MessOwnerProfile extends StatefulWidget {
   @override
   State<MessOwnerProfile> createState() => _MessOwnerProfileState();
 }
+
 class _MessOwnerProfileState extends State<MessOwnerProfile> {
   final aboutOwnerController = TextEditingController();
   final breakfastController = TextEditingController();
   final lunchController = TextEditingController();
   final dinnerControoler = TextEditingController();
-  final aboutrentController=TextEditingController();
+  final aboutrentController = TextEditingController();
 
-  bool veg=false;
-  bool nonveg=false;
+  bool veg = false;
+  bool nonveg = false;
   String fname = 'loading';
   String lname = '';
   String email = '';
@@ -35,13 +35,16 @@ class _MessOwnerProfileState extends State<MessOwnerProfile> {
   String ltime = 'Give timing';
   String dtime = 'Give timing';
   String aboutOwner = 'Add about your self..';
-  String aboutrent='Give information about rents.';
+  String aboutrent = 'Give information about rents.';
+
   var image;
+
   final Image owner_profile_image = const Image(
       image: AssetImage("assets/images/profile_png.jpg"),
       fit: BoxFit.cover,
       height: 145,
       width: 145);
+
   bool isloding = false;
 
   Future<void> retriveData() async {
@@ -60,11 +63,12 @@ class _MessOwnerProfileState extends State<MessOwnerProfile> {
           email = map['email'];
           locaton = map['location'];
           messName = map['name'];
-          veg=map['veg']??false;
-          nonveg=map['nonveg']??false;
+          veg = map['veg'] ?? false;
+          nonveg = map['nonveg'] ?? false;
           mobileNumber = map['mobile_number'];
           aboutOwner = map['about_owner'] ?? 'Add about your self.';
-          aboutrent=map['about_mess_rents']??'Give information about rents.';
+          aboutrent =
+              map['about_mess_rents'] ?? 'Give information about rents.';
           image = map['profile_image'];
           print(fname);
           print(lname);
@@ -77,36 +81,31 @@ class _MessOwnerProfileState extends State<MessOwnerProfile> {
       });
     });
   }
-  Future<void> retriveTiming()async{
+
+  Future<void> retriveTiming() async {
     await FirebaseDatabase.instance
         // ignore: deprecated_member_use
         .reference()
-        .child('Users/all_users/${FirebaseAuth.instance.currentUser!.uid}/timing').once().then((value) {
-          setState((){
-            Map<dynamic,dynamic> map=value.snapshot.value as Map;
-            btime=map['breakfasttime']??'Give Breakfast time';
-            ltime=map['lunchtime']??'Give Lunch time';
-            dtime=map['dinnertime']??'Give Dinner time';
-          });
-    });
-  }
-
-  Future<void> getfoodType() async{
-    FirebaseDatabase.instance.reference().child('Users/mess_owners/${FirebaseAuth.instance.currentUser!.uid}').once().then((value) {
-      setState((){
-        Map<dynamic,dynamic> map=value.snapshot.value as Map;
-        veg=map['veg']??false;
-        nonveg=map['nonveg']??false;
+        .child(
+            'Users/all_users/${FirebaseAuth.instance.currentUser!.uid}/timing')
+        .once()
+        .then((value) {
+      setState(() {
+        Map<dynamic, dynamic> map = value.snapshot.value as Map;
+        btime = map['breakfasttime'] ?? 'Give Breakfast time';
+        ltime = map['lunchtime'] ?? 'Give Lunch time';
+        dtime = map['dinnertime'] ?? 'Give Dinner time';
       });
     });
   }
+
+
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
     retriveData();
     retriveTiming();
-    //getfoodType();
   }
 
   Future getOwnerImage(String name) async {
@@ -232,7 +231,7 @@ class _MessOwnerProfileState extends State<MessOwnerProfile> {
         elevation: 0,
       ),
       endDrawer: MessOwnerDrawer(),
-      body: ListView(
+      body: isloding==false? ListView(
         children: [
           Card(
             elevation: 1,
@@ -376,12 +375,11 @@ class _MessOwnerProfileState extends State<MessOwnerProfile> {
                                                       .once()
                                                       .then((value) {
                                                     setState(() {
-                                                        Map<dynamic, dynamic>?
-                                                            map = value.snapshot
-                                                                .value as Map?;
-                                                        aboutOwner =
-                                                            map!['about_owner'];
-
+                                                      Map<dynamic, dynamic>?
+                                                          map = value.snapshot
+                                                              .value as Map?;
+                                                      aboutOwner =
+                                                          map!['about_owner'];
                                                     });
                                                   });
                                                   Navigator.pop(context, false);
@@ -396,7 +394,10 @@ class _MessOwnerProfileState extends State<MessOwnerProfile> {
                                                 }
                                               });
                                             },
-                                            child: const Text('Save ',style: TextStyle(fontSize: 20),),
+                                            child: const Text(
+                                              'Save ',
+                                              style: TextStyle(fontSize: 20),
+                                            ),
                                           ),
                                           GestureDetector(
                                               onTap: () {
@@ -404,7 +405,10 @@ class _MessOwnerProfileState extends State<MessOwnerProfile> {
                                                   Navigator.pop(context, false);
                                                 });
                                               },
-                                              child: const Text(' Cancel',style: TextStyle(fontSize: 20),))
+                                              child: const Text(
+                                                ' Cancel',
+                                                style: TextStyle(fontSize: 20),
+                                              ))
                                         ],
                                       ));
                             },
@@ -419,12 +423,15 @@ class _MessOwnerProfileState extends State<MessOwnerProfile> {
                             style: TextStyle(fontSize: 25),
                           ),
                           subtitle: Container(
-                            decoration: BoxDecoration(
-                              color: Colors.grey.withOpacity(0.2),
-                              borderRadius: BorderRadius.circular(10)
-                            ),
-                            padding: EdgeInsets.all(15),
-                              child: Text(aboutOwner,style: TextStyle(fontSize: 15,color: Colors.black),)),
+                              decoration: BoxDecoration(
+                                  color: Colors.grey.withOpacity(0.2),
+                                  borderRadius: BorderRadius.circular(10)),
+                              padding: EdgeInsets.all(15),
+                              child: Text(
+                                aboutOwner,
+                                style: TextStyle(
+                                    fontSize: 15, color: Colors.black),
+                              )),
                         ),
                       ],
                     )),
@@ -447,7 +454,6 @@ class _MessOwnerProfileState extends State<MessOwnerProfile> {
                     style: TextStyle(color: Colors.grey, fontSize: 15),
                   ),
                 ),
-
                 ListTile(
                   leading: const Icon(
                     Icons.email_sharp,
@@ -482,142 +488,172 @@ class _MessOwnerProfileState extends State<MessOwnerProfile> {
             ),
           ),
           Card(
-            child:Column(
-              children: [
-                ListTile(
-                  title: Text('Food type:',style: TextStyle(fontSize: 25),),
+              child: Column(
+            children: [
+              ListTile(
+                title: Text(
+                  'Food type:',
+                  style: TextStyle(fontSize: 25),
                 ),
-                ListTile(
-                  trailing: Checkbox(
-                    value: veg, onChanged: (bool? value) {
-                      Map<String,dynamic> map={'veg':value};
-                      FirebaseDatabase.instance.reference().child('Users/all_users/${FirebaseAuth.instance.currentUser!.uid}').update(map).then((value){
-                        FirebaseDatabase.instance.reference().child('Users/mess_owners/${FirebaseAuth.instance.currentUser!.uid}').update(map);
-                      });
-                      print(value);
-                      setState((){
-                        this.veg=value as bool;
-                      });
-                  },
-                  ),
-                  title: Text('Vegetarian.',style: TextStyle(fontSize: 20),),
-                ),
-                ListTile(
-                  trailing: Checkbox(
-                    value: nonveg, onChanged: (bool? value) {
-
-                    Map<String,dynamic> map={'nonveg':value};
-                    // ignore: deprecated_member_use
-                    FirebaseDatabase.instance.reference().child('Users/all_users/${FirebaseAuth.instance.currentUser!.uid}').update(map)
-                    .then((value) {
-                      FirebaseDatabase.instance.reference().child('Users/mess_owners/${FirebaseAuth.instance.currentUser!.uid}').update(map);
+              ),
+              ListTile(
+                trailing: Checkbox(
+                  value: veg,
+                  onChanged: (bool? value) {
+                    Map<String, dynamic> map = {'veg': value};
+                    FirebaseDatabase.instance
+                        .reference()
+                        .child(
+                            'Users/all_users/${FirebaseAuth.instance.currentUser!.uid}')
+                        .update(map)
+                        .then((value) {
+                      FirebaseDatabase.instance
+                          .reference()
+                          .child(
+                              'Users/mess_owners/${FirebaseAuth.instance.currentUser!.uid}')
+                          .update(map);
                     });
-                      print(value);
-                      setState((){
-                        this.nonveg=value as bool;
-                      });
+                    print(value);
+                    setState(() {
+                      this.veg = value as bool;
+                    });
                   },
-                  ),
-                  title: Text('Non-vegetarian.',style: TextStyle(fontSize: 20),),
                 ),
-              ],
-            )
-          ),
+                title: Text(
+                  'Vegetarian.',
+                  style: TextStyle(fontSize: 20),
+                ),
+              ),
+              ListTile(
+                trailing: Checkbox(
+                  value: nonveg,
+                  onChanged: (bool? value) {
+                    Map<String, dynamic> map = {'nonveg': value};
+                    // ignore: deprecated_member_use
+                    FirebaseDatabase.instance
+                        .reference()
+                        .child(
+                            'Users/all_users/${FirebaseAuth.instance.currentUser!.uid}')
+                        .update(map)
+                        .then((value) {
+                      FirebaseDatabase.instance
+                          .reference()
+                          .child(
+                              'Users/mess_owners/${FirebaseAuth.instance.currentUser!.uid}')
+                          .update(map);
+                    });
+                    print(value);
+                    setState(() {
+                      this.nonveg = value as bool;
+                    });
+                  },
+                ),
+                title: Text(
+                  'Non-vegetarian.',
+                  style: TextStyle(fontSize: 20),
+                ),
+              ),
+            ],
+          )),
           Card(
             elevation: 0,
             child: ListTile(
-              title: Text('About rent',style: TextStyle(color: Colors.black,fontSize: 25),),
+              title: Text(
+                'About rent',
+                style: TextStyle(color: Colors.black, fontSize: 25),
+              ),
               subtitle: Container(
                   decoration: BoxDecoration(
                       color: Colors.grey.withOpacity(0.2),
-                      borderRadius: BorderRadius.circular(10)
-                  ),
+                      borderRadius: BorderRadius.circular(10)),
                   padding: EdgeInsets.all(15),
-                  child: Text(aboutrent,style: TextStyle(fontSize: 15,color: Colors.black),)),
+                  child: Text(
+                    aboutrent,
+                    style: TextStyle(fontSize: 15, color: Colors.black),
+                  )),
               trailing: GestureDetector(
                   onTap: () {
                     showDialog(
                         context: context,
                         builder: (context) => AlertDialog(
-                          title: const Text(
-                            "Write about mess rents.",
-                            style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 20),
-                          ),
-                          content: TextField(
-                            decoration: const InputDecoration(
-                                focusedBorder:
-                                OutlineInputBorder(),
-                                enabledBorder:
-                                OutlineInputBorder()),
-                            keyboardType: TextInputType.multiline,
-                            maxLines: 4,
-                            controller: aboutrentController,
-                            maxLength: 500,
-                          ),
-                          actions: [
-                            GestureDetector(
-                              onTap: () {
-                                setState(() async {
-                                  if (aboutrentController
-                                      .text.isEmpty) {
-                                    ScaffoldMessenger.of(context)
-                                        .showSnackBar(
-                                        const SnackBar(
+                              title: const Text(
+                                "Write about mess rents.",
+                                style: TextStyle(
+                                    fontWeight: FontWeight.bold, fontSize: 20),
+                              ),
+                              content: TextField(
+                                decoration: const InputDecoration(
+                                    focusedBorder: OutlineInputBorder(),
+                                    enabledBorder: OutlineInputBorder()),
+                                keyboardType: TextInputType.multiline,
+                                maxLines: 4,
+                                controller: aboutrentController,
+                                maxLength: 500,
+                              ),
+                              actions: [
+                                GestureDetector(
+                                  onTap: () {
+                                    setState(() async {
+                                      if (aboutrentController.text.isEmpty) {
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(const SnackBar(
                                           content: Text(
                                               'Fill the above information.'),
                                           backgroundColor: Colors.red,
                                         ));
-                                  } else {
-                                    setState((){
-                                      aboutrent =
-                                          aboutrentController.text;
-                                    });
-                                    Map<String, dynamic> map = {
-                                      'about_mess_rents':
-                                      aboutrent.toString()
-                                    };
-                                    FirebaseDatabase.instance
-                                        .reference()
-                                        .child(
-                                        'Users/all_users/${FirebaseAuth.instance.currentUser!.uid}')
-                                        .update(map)
-                                        .then((value) {
-                                      FirebaseDatabase.instance
-                                          .reference()
-                                          .child(
-                                          'Users/mess_owners/${FirebaseAuth.instance.currentUser!.uid}')
-                                          .update(map);
-                                    });
+                                      } else {
+                                        setState(() {
+                                          aboutrent = aboutrentController.text;
+                                        });
+                                        Map<String, dynamic> map = {
+                                          'about_mess_rents':
+                                              aboutrent.toString()
+                                        };
+                                        FirebaseDatabase.instance
+                                            .reference()
+                                            .child(
+                                                'Users/all_users/${FirebaseAuth.instance.currentUser!.uid}')
+                                            .update(map)
+                                            .then((value) {
+                                          FirebaseDatabase.instance
+                                              .reference()
+                                              .child(
+                                                  'Users/mess_owners/${FirebaseAuth.instance.currentUser!.uid}')
+                                              .update(map);
+                                        });
 
-
-                                    Navigator.pop(context, false);
-                                    ScaffoldMessenger.of(context)
-                                        .showSnackBar(
-                                        const SnackBar(
-                                          content: Text(
-                                              'Information updated...'),
-                                          backgroundColor:
-                                          Colors.green,
+                                        Navigator.pop(context, false);
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(const SnackBar(
+                                          content:
+                                              Text('Information updated...'),
+                                          backgroundColor: Colors.green,
                                         ));
-                                  }
-                                });
-                              },
-                              child: const Text('Save ',style: TextStyle(fontSize: 20),),
-                            ),
-                            GestureDetector(
-                                onTap: () {
-                                  setState(() {
-                                    Navigator.pop(context, false);
-                                  });
-                                },
-                                child: const Text(' Cancel',style: TextStyle(fontSize: 20),))
-                          ],
-                        ));
+                                      }
+                                    });
+                                  },
+                                  child: const Text(
+                                    'Save ',
+                                    style: TextStyle(fontSize: 20),
+                                  ),
+                                ),
+                                GestureDetector(
+                                    onTap: () {
+                                      setState(() {
+                                        Navigator.pop(context, false);
+                                      });
+                                    },
+                                    child: const Text(
+                                      ' Cancel',
+                                      style: TextStyle(fontSize: 20),
+                                    ))
+                              ],
+                            ));
                   },
-                  child: Icon(Icons.edit,color: Colors.grey,)),
-
+                  child: Icon(
+                    Icons.edit,
+                    color: Colors.grey,
+                  )),
             ),
           ),
           Card(
@@ -669,28 +705,44 @@ class _MessOwnerProfileState extends State<MessOwnerProfile> {
                                               backgroundColor: Colors.red,
                                             ));
                                           } else {
-                                            setState((){
-                                              btime=breakfastController.text;
+                                            setState(() {
+                                              btime = breakfastController.text;
                                             });
-                                            Map<String,dynamic> map={'breakfasttime':breakfastController.text.toString()};
+                                            Map<String, dynamic> map = {
+                                              'breakfasttime':
+                                                  breakfastController.text
+                                                      .toString()
+                                            };
                                             // ignore: deprecated_member_use
-                                            FirebaseDatabase.instance.reference().child('Users/all_users/${FirebaseAuth.instance.currentUser!.uid}').child('timing')
-                                            .update(map).then((value) => {
-                                              FirebaseDatabase.instance.reference().child('Users/mess_owners/${FirebaseAuth.instance.currentUser!.uid}').child('timing')
-                                                  .update(map).then((value) => {
-
-                                              ScaffoldMessenger.of(context)
-                                                  .showSnackBar(
-                                              const SnackBar(
-                                              content: Text(
-                                              'Information added sucsesfully...',
-                                              style: TextStyle(
-                                              color: Colors.white)),
-                                              backgroundColor: Colors.green,
-                                              ))
-
-                                              })
-                                            });
+                                            FirebaseDatabase.instance
+                                                .reference()
+                                                .child(
+                                                    'Users/all_users/${FirebaseAuth.instance.currentUser!.uid}')
+                                                .child('timing')
+                                                .update(map)
+                                                .then((value) => {
+                                                      FirebaseDatabase.instance
+                                                          .reference()
+                                                          .child(
+                                                              'Users/mess_owners/${FirebaseAuth.instance.currentUser!.uid}')
+                                                          .child('timing')
+                                                          .update(map)
+                                                          .then((value) => {
+                                                                ScaffoldMessenger.of(
+                                                                        context)
+                                                                    .showSnackBar(
+                                                                        const SnackBar(
+                                                                  content: Text(
+                                                                      'Information added sucsesfully...',
+                                                                      style: TextStyle(
+                                                                          color:
+                                                                              Colors.white)),
+                                                                  backgroundColor:
+                                                                      Colors
+                                                                          .green,
+                                                                ))
+                                                              })
+                                                    });
                                             Navigator.pop(context, false);
                                             ScaffoldMessenger.of(context)
                                                 .showSnackBar(const SnackBar(
@@ -701,7 +753,10 @@ class _MessOwnerProfileState extends State<MessOwnerProfile> {
                                           }
                                         });
                                       },
-                                      child: const Text('Save ',style: TextStyle(fontSize: 20),),
+                                      child: const Text(
+                                        'Save ',
+                                        style: TextStyle(fontSize: 20),
+                                      ),
                                     ),
                                     GestureDetector(
                                         onTap: () {
@@ -709,7 +764,10 @@ class _MessOwnerProfileState extends State<MessOwnerProfile> {
                                             Navigator.pop(context, false);
                                           });
                                         },
-                                        child: const Text(' Cancel',style: TextStyle(fontSize: 20),))
+                                        child: const Text(
+                                          ' Cancel',
+                                          style: TextStyle(fontSize: 20),
+                                        ))
                                   ],
                                 ));
                       },
@@ -720,8 +778,7 @@ class _MessOwnerProfileState extends State<MessOwnerProfile> {
                   subtitle: Container(
                     decoration: BoxDecoration(
                         color: Colors.grey.withOpacity(0.2),
-                        borderRadius: BorderRadius.circular(10)
-                    ),
+                        borderRadius: BorderRadius.circular(10)),
                     padding: EdgeInsets.all(15),
                     child: Text(
                       btime,
@@ -767,29 +824,44 @@ class _MessOwnerProfileState extends State<MessOwnerProfile> {
                                               backgroundColor: Colors.red,
                                             ));
                                           } else {
-                                            setState((){
-                                              ltime=lunchController.text;
+                                            setState(() {
+                                              ltime = lunchController.text;
                                             });
-                                            Map<String,dynamic> map={'lunchtime':lunchController.text.toString()};
+                                            Map<String, dynamic> map = {
+                                              'lunchtime': lunchController.text
+                                                  .toString()
+                                            };
                                             // ignore: deprecated_member_use
-                                            FirebaseDatabase.instance.reference().child('Users/all_users/${FirebaseAuth.instance.currentUser!.uid}').child('timing')
-                                                .update(map).then((value) => {
-                                              // ignore: deprecated_member_use
-                                              FirebaseDatabase.instance.reference().child('Users/mess_owners/${FirebaseAuth.instance.currentUser!.uid}').child('timing')
-                                                  .update(map).then((value) => {
-
-                                                ScaffoldMessenger.of(context)
-                                                    .showSnackBar(
-                                                    const SnackBar(
-                                                      content: Text(
-                                                          'Information added sucsesfully...',
-                                                          style: TextStyle(
-                                                              color: Colors.white)),
-                                                      backgroundColor: Colors.green,
-                                                    ))
-
-                                              })
-                                            });
+                                            FirebaseDatabase.instance
+                                                .reference()
+                                                .child(
+                                                    'Users/all_users/${FirebaseAuth.instance.currentUser!.uid}')
+                                                .child('timing')
+                                                .update(map)
+                                                .then((value) => {
+                                                      // ignore: deprecated_member_use
+                                                      FirebaseDatabase.instance
+                                                          .reference()
+                                                          .child(
+                                                              'Users/mess_owners/${FirebaseAuth.instance.currentUser!.uid}')
+                                                          .child('timing')
+                                                          .update(map)
+                                                          .then((value) => {
+                                                                ScaffoldMessenger.of(
+                                                                        context)
+                                                                    .showSnackBar(
+                                                                        const SnackBar(
+                                                                  content: Text(
+                                                                      'Information added sucsesfully...',
+                                                                      style: TextStyle(
+                                                                          color:
+                                                                              Colors.white)),
+                                                                  backgroundColor:
+                                                                      Colors
+                                                                          .green,
+                                                                ))
+                                                              })
+                                                    });
 
                                             Navigator.pop(context, false);
                                             ScaffoldMessenger.of(context)
@@ -801,7 +873,10 @@ class _MessOwnerProfileState extends State<MessOwnerProfile> {
                                           }
                                         });
                                       },
-                                      child: const Text('Save ',style: TextStyle(fontSize: 20),),
+                                      child: const Text(
+                                        'Save ',
+                                        style: TextStyle(fontSize: 20),
+                                      ),
                                     ),
                                     GestureDetector(
                                         onTap: () {
@@ -809,7 +884,10 @@ class _MessOwnerProfileState extends State<MessOwnerProfile> {
                                             Navigator.pop(context, false);
                                           });
                                         },
-                                        child: const Text(' Cancel',style: TextStyle(fontSize: 20),))
+                                        child: const Text(
+                                          ' Cancel',
+                                          style: TextStyle(fontSize: 20),
+                                        ))
                                   ],
                                 ));
                       },
@@ -820,8 +898,7 @@ class _MessOwnerProfileState extends State<MessOwnerProfile> {
                   subtitle: Container(
                     decoration: BoxDecoration(
                         color: Colors.grey.withOpacity(0.2),
-                        borderRadius: BorderRadius.circular(10)
-                    ),
+                        borderRadius: BorderRadius.circular(10)),
                     padding: EdgeInsets.all(15),
                     child: Text(
                       ltime,
@@ -867,26 +944,44 @@ class _MessOwnerProfileState extends State<MessOwnerProfile> {
                                               backgroundColor: Colors.red,
                                             ));
                                           } else {
-                                            setState((){
-                                              dtime=dinnerControoler.text;
+                                            setState(() {
+                                              dtime = dinnerControoler.text;
                                             });
-                                            Map<String,dynamic> map={'dinnertime':dinnerControoler.text.toString()};
+                                            Map<String, dynamic> map = {
+                                              'dinnertime': dinnerControoler
+                                                  .text
+                                                  .toString()
+                                            };
                                             // ignore: deprecated_member_use
-                                            FirebaseDatabase.instance.reference().child('Users/all_users/${FirebaseAuth.instance.currentUser!.uid}').child('timing')
-                                                .update(map).then((value) => {
-                                              FirebaseDatabase.instance.reference().child('Users/mess_owners/${FirebaseAuth.instance.currentUser!.uid}').child('timing')
-                                                  .update(map).then((value) => {
-                                                ScaffoldMessenger.of(context)
-                                                    .showSnackBar(
-                                                    const SnackBar(
-                                                      content: Text(
-                                                          'Information added sucsesfully...',
-                                                          style: TextStyle(
-                                                              color: Colors.white)),
-                                                      backgroundColor: Colors.green,
-                                                    ))
-                                              })
-                                            });
+                                            FirebaseDatabase.instance
+                                                .reference()
+                                                .child(
+                                                    'Users/all_users/${FirebaseAuth.instance.currentUser!.uid}')
+                                                .child('timing')
+                                                .update(map)
+                                                .then((value) => {
+                                                      FirebaseDatabase.instance
+                                                          .reference()
+                                                          .child(
+                                                              'Users/mess_owners/${FirebaseAuth.instance.currentUser!.uid}')
+                                                          .child('timing')
+                                                          .update(map)
+                                                          .then((value) => {
+                                                                ScaffoldMessenger.of(
+                                                                        context)
+                                                                    .showSnackBar(
+                                                                        const SnackBar(
+                                                                  content: Text(
+                                                                      'Information added sucsesfully...',
+                                                                      style: TextStyle(
+                                                                          color:
+                                                                              Colors.white)),
+                                                                  backgroundColor:
+                                                                      Colors
+                                                                          .green,
+                                                                ))
+                                                              })
+                                                    });
                                             Navigator.pop(context, false);
                                             ScaffoldMessenger.of(context)
                                                 .showSnackBar(const SnackBar(
@@ -897,7 +992,10 @@ class _MessOwnerProfileState extends State<MessOwnerProfile> {
                                           }
                                         });
                                       },
-                                      child: const Text('Save ',style: TextStyle(fontSize: 20),),
+                                      child: const Text(
+                                        'Save ',
+                                        style: TextStyle(fontSize: 20),
+                                      ),
                                     ),
                                     GestureDetector(
                                         onTap: () {
@@ -905,7 +1003,10 @@ class _MessOwnerProfileState extends State<MessOwnerProfile> {
                                             Navigator.pop(context, false);
                                           });
                                         },
-                                        child: const Text(' Cancel',style: TextStyle(fontSize: 20),))
+                                        child: const Text(
+                                          ' Cancel',
+                                          style: TextStyle(fontSize: 20),
+                                        ))
                                   ],
                                 ));
                       },
@@ -916,8 +1017,7 @@ class _MessOwnerProfileState extends State<MessOwnerProfile> {
                   subtitle: Container(
                     decoration: BoxDecoration(
                         color: Colors.grey.withOpacity(0.2),
-                        borderRadius: BorderRadius.circular(10)
-                    ),
+                        borderRadius: BorderRadius.circular(10)),
                     padding: EdgeInsets.all(15),
                     child: Text(
                       dtime,
@@ -928,9 +1028,23 @@ class _MessOwnerProfileState extends State<MessOwnerProfile> {
               ],
             ),
           ),
-
         ],
-      ),
+      ):Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              CircularProgressIndicator(
+                color: Colors.blueAccent,
+              ),
+              SizedBox(
+                height: 20,
+              ),
+              Text(
+                'Uploading...',
+                style: TextStyle(color: Colors.grey, fontSize: 20),
+              )
+            ],
+          )),
     );
   }
 }

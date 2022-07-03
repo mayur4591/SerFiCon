@@ -3,7 +3,8 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_database/ui/firebase_animated_list.dart';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
-import 'package:serficon/Bottom_nav/roomOwnerList.dart';
+
+import '../List_of_owners/roomOwnerList.dart';
 
 class Photos extends StatefulWidget {
   const Photos({Key? key}) : super(key: key);
@@ -13,26 +14,30 @@ class Photos extends StatefulWidget {
 }
 
 class _PhotosState extends State<Photos> {
-
-  bool list=true;
-  check()
-  {
-    FirebaseDatabase.instance.reference().child(
-        'Users/all_users/${FirebaseAuth.instance.currentUser!.uid}/room_photos').once().then((value) => {
-      if(value.snapshot.value==null)
-        {
-          setState((){
-            list=false;
-          })
-        }
-    });
+  bool list = true;
+  check() {
+    FirebaseDatabase.instance
+        .reference()
+        .child(
+            'Users/all_users/${FirebaseAuth.instance.currentUser!.uid}/room_photos')
+        .once()
+        .then((value) => {
+              if (value.snapshot.value == null)
+                {
+                  setState(() {
+                    list = false;
+                  })
+                }
+            });
   }
+
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
     check();
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -44,21 +49,23 @@ class _PhotosState extends State<Photos> {
           style: TextStyle(color: Colors.black, fontSize: 25),
         ),
       ),
-      body: list?buildHome():Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children:  [
-          Lottie.asset('assets/lottie/empty.json'),
-          Container(
-            margin: EdgeInsets.only(left: 25,right: 25),
-            child: Center(
-                child: Text(
-                  'Room owner have not uploaded any photos..!!',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(color: Colors.grey, fontSize: 25),
-                )),
-          )
-        ],
-      ),
+      body: list
+          ? buildHome()
+          : Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Lottie.asset('assets/lottie/empty.json'),
+                Container(
+                  margin: EdgeInsets.only(left: 25, right: 25),
+                  child: Center(
+                      child: Text(
+                    'Room owner have not uploaded any photos..!!',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(color: Colors.grey, fontSize: 25),
+                  )),
+                )
+              ],
+            ),
     );
   }
 

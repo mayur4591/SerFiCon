@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'package:expandable/expandable.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -111,7 +110,6 @@ class _OwnerProfileState extends State<OwnerProfile> {
             });
           });
           print(value);
-
         });
       });
       setState(() {
@@ -178,9 +176,7 @@ class _OwnerProfileState extends State<OwnerProfile> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    // ignore: deprecated_member_use
     auth = FirebaseAuth.instance;
-    // ignore: deprecated_member_use
     final User? user = auth.currentUser;
     uid = user!.uid;
     setState(() {

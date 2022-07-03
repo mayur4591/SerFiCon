@@ -5,7 +5,6 @@ import 'package:firebase_database/ui/firebase_animated_list.dart';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
 import 'dart:math';
-import '../Modal Classes/ristrictions_model.dart';
 
 class About_Facilities extends StatefulWidget {
   const About_Facilities({Key? key}) : super(key: key);
@@ -15,12 +14,12 @@ class About_Facilities extends StatefulWidget {
 }
 
 class _About_FacilitiesState extends State<About_Facilities> {
-  bool loading=false;
+  bool loading = false;
 
   final titlecontroller = TextEditingController();
   final facilityController = TextEditingController();
   // ignore: deprecated_member_use
-  final DatabaseReference reference=FirebaseDatabase.instance.reference();
+  final DatabaseReference reference = FirebaseDatabase.instance.reference();
   late Query _ref;
 
   void dispose() {
@@ -34,24 +33,26 @@ class _About_FacilitiesState extends State<About_Facilities> {
     FirebaseDatabase.instance
         .reference()
         .child(
-        'Users/all_users/${FirebaseAuth.instance.currentUser!.uid}/facilities')
+            'Users/all_users/${FirebaseAuth.instance.currentUser!.uid}/facilities')
         .once()
         .then((value) => {
-      if (value.snapshot.value == null)
-        {
-          setState(() {
-            list = false;
-          })
-        }
-    });
+              if (value.snapshot.value == null)
+                {
+                  setState(() {
+                    list = false;
+                  })
+                }
+            });
   }
+
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
     // ignore: deprecated_member_use
     check();
-    _ref = FirebaseDatabase.instance.reference().child('Users/all_users/${FirebaseAuth.instance.currentUser!.uid}/facilities');
+    _ref = FirebaseDatabase.instance.reference().child(
+        'Users/all_users/${FirebaseAuth.instance.currentUser!.uid}/facilities');
   }
 
   Future openDialoge() => showDialog(
@@ -101,7 +102,6 @@ class _About_FacilitiesState extends State<About_Facilities> {
           actions: [
             TextButton(
                 onPressed: () {
-
                   if (facilityController.text.isEmpty ||
                       titlecontroller.text.isEmpty) {
                     ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
@@ -113,25 +113,36 @@ class _About_FacilitiesState extends State<About_Facilities> {
                         elevation: 2,
                         behavior: SnackBarBehavior.floating));
                   } else {
-                    setState((){
-                      loading=true;
+                    setState(() {
+                      loading = true;
                     });
-                    var r=Random();
-                    var n1=r.nextInt(16);
-                    var n2=r.nextInt(15);
-                    if(n2>=n1)
-                      {
-                        n2=n2+1;
-                      }
-                    Map<String,dynamic> map={'title':titlecontroller.text.toString(),'facility':facilityController.text.toString()};
-                    reference.child('Users/all_users/${FirebaseAuth.instance.currentUser!.uid}/facilities').child('facility$n2').update(map).then((value) {
-                      reference.child('Users/room_owners/${FirebaseAuth.instance.currentUser!.uid}/facilities').child('facility$n2').update(map);
+                    var r = Random();
+                    var n1 = r.nextInt(16);
+                    var n2 = r.nextInt(15);
+                    if (n2 >= n1) {
+                      n2 = n2 + 1;
+                    }
+                    Map<String, dynamic> map = {
+                      'title': titlecontroller.text.toString(),
+                      'facility': facilityController.text.toString()
+                    };
+                    reference
+                        .child(
+                            'Users/all_users/${FirebaseAuth.instance.currentUser!.uid}/facilities')
+                        .child('facility$n2')
+                        .update(map)
+                        .then((value) {
+                      reference
+                          .child(
+                              'Users/room_owners/${FirebaseAuth.instance.currentUser!.uid}/facilities')
+                          .child('facility$n2')
+                          .update(map);
                     });
 
-                        Navigator.pop(context,false);
+                    Navigator.pop(context, false);
                   }
-                  setState((){
-                    loading=false;
+                  setState(() {
+                    loading = false;
                   });
                 },
                 child: const Text('ADD'))
@@ -147,16 +158,15 @@ class _About_FacilitiesState extends State<About_Facilities> {
             title: ExpandablePanel(
                 header: Text(
                   facility['title'],
-                  style: const TextStyle(
-                      fontSize: 25, color: Colors.black),
+                  style: const TextStyle(fontSize: 25, color: Colors.black),
                 ),
                 collapsed: const Text(''),
                 expanded: Text(
                   facility['facility'],
-                  style: const TextStyle(
-                      fontSize: 20, color: Colors.grey),
+                  style: const TextStyle(fontSize: 20, color: Colors.grey),
                 ))));
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -175,29 +185,44 @@ class _About_FacilitiesState extends State<About_Facilities> {
             openDialoge();
           },
         ),
-        body: loading==false? list?buildHome():Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Lottie.asset('assets/lottie/empty.json'),
-            Container(
-              margin: EdgeInsets.only(left: 25, right: 25),
-              child: Center(
-                  child: Text(
-                    'You have not uploaded anything..!',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(color: Colors.grey, fontSize: 25),
-                  )),
-            )
-          ],
-        ):Center(child: Column(mainAxisAlignment: MainAxisAlignment.center,children: [
-          CircularProgressIndicator(color: Colors.blueAccent,),
-          SizedBox(height: 20,),
-          Text('Uploading...',style: TextStyle(color: Colors.grey,fontSize: 20),)
-        ],),)
-      //],
-    );
+        body: loading == false
+            ? list
+                ? buildHome()
+                : Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Lottie.asset('assets/lottie/empty.json'),
+                      Container(
+                        margin: EdgeInsets.only(left: 25, right: 25),
+                        child: Center(
+                            child: Text(
+                          'You have not uploaded anything..!',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(color: Colors.grey, fontSize: 25),
+                        )),
+                      )
+                    ],
+                  )
+            : Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    CircularProgressIndicator(
+                      color: Colors.blueAccent,
+                    ),
+                    SizedBox(
+                      height: 20,
+                    ),
+                    Text(
+                      'Uploading...',
+                      style: TextStyle(color: Colors.grey, fontSize: 20),
+                    )
+                  ],
+                ),
+              )
+        //],
+        );
   }
-
 
   Widget buildHome() {
     return FirebaseAnimatedList(
@@ -208,5 +233,4 @@ class _About_FacilitiesState extends State<About_Facilities> {
           return _buildListView(owners!);
         });
   }
-
 }
