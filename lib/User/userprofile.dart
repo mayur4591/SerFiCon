@@ -100,7 +100,7 @@ class _UserProfileState extends State<UserProfile> {
     } else if (name == 'Camera') {
       String? url;
       final profile =
-          await ImagePicker().pickImage(source: ImageSource.gallery);
+          await ImagePicker().pickImage(source: ImageSource.camera);
       setState(() {
         isloding = true;
       });
