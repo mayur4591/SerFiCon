@@ -186,45 +186,6 @@ class _HomePageState extends State<HomePage> {
       ),
     );
   }
-  // void checkScreen() {
-  //   print('in check screen');
-  //   switch(role)
-  //   {
-  //     case 'customer':setState((){
-  //       page=MenuPage();
-  //     });
-  //     break;
-  //
-  //     case 'room_owner': setState((){
-  //       page=RoomOwnerMenuPage();
-  //     });
-  //     break;
-  //
-  //     case 'mess_owner': print('hello mayur');
-  //     setState((){
-  //       page=MessOwnerMenuPage();
-  //     });
-  //     break;
-  //   }
-  //   // if(role=='customer')
-  //   // {
-  //   //   setState((){
-  //   //     page=MenuPage();
-  //   //   });
-  //   // }
-  //   // else if(role=='room_owner')
-  //   // {
-  //   //   setState((){
-  //   //     page=RoomOwnerMenuPage();
-  //   //   });
-  //   // }
-  //   // else if(role=='mess_owner')
-  //   // {
-  //   //   print('hello mayur');
-  //   //   setState((){
-  //   //     page=MessOwnerMenuPage();
-  //   //   });
-  //   // }
-  // }
+
 }
 
